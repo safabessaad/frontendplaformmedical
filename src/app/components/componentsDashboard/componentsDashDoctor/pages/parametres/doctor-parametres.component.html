@@ -1,43 +1,131 @@
-<app-dashboard-shell
-  [title]="'Settings'"
-  [subtitle]="'Cabinet preferences, language and notification options.'"
-  [secondaryMetrics]="[
-    { label: 'Users with access', value: '12' },
-    { label: 'Security level', value: 'Standard' },
-    { label: 'Backups this week', value: '7' },
-    { label: 'Audit events', value: '23' }
-  ]"
->
-  <div shell-actions>
-    <button class="btn btn-soft-primary">View audit log</button>
+<section class="settings-page">
+  <header class="settings-header card">
+    <div class="header-text">
+      <h2>Settings</h2>
+      <p class="subtitle">Cabinet preferences, language and notification options.</p>
+    </div>
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="openAuditLog()">
+      View audit log
+    </button>
+  </header>
+
+  <div class="summary-strip card">
+    <div class="stat" *ngFor="let s of summaryStats">
+      <span class="stat-value">{{ s.value }}</span>
+      <span class="stat-label">{{ s.label }}</span>
+    </div>
   </div>
-  <div class="card border-0 shadow-sm">
-    <div class="card-body row g-3">
-      <div class="col-md-4">
-        <label class="form-label">Language</label>
-        <select class="form-select" [(ngModel)]="settings.language">
+
+  <nav class="tabs card">
+    <button
+      *ngFor="let tab of tabs"
+      type="button"
+      [class.active]="activeTab === tab.key"
+      (click)="activeTab = tab.key"
+    >
+      {{ tab.label }}
+    </button>
+  </nav>
+
+  <!-- Account -->
+  <section class="tab-panel card" *ngIf="activeTab === 'account'">
+    <h3 class="panel-title">Cabinet &amp; profile</h3>
+    <div class="form-grid">
+      <label class="field">
+        <span>Language</span>
+        <select class="form-select form-select-sm" [(ngModel)]="settings.language">
           <option value="fr">Français</option>
           <option value="en">English</option>
-          <option value="ar">Arabic</option>
+          <option value="ar">العربية</option>
         </select>
-      </div>
-      <div class="col-md-8 d-flex flex-wrap align-items-end gap-4">
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" [(ngModel)]="settings.darkMode" id="darkMode" />
-          <label class="form-check-label" for="darkMode">Dark mode</label>
-        </div>
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" [(ngModel)]="settings.emailNotifications" id="emailNotif" />
-          <label class="form-check-label" for="emailNotif">Email notifications</label>
-        </div>
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" [(ngModel)]="settings.whatsappReminders" id="waNotif" />
-          <label class="form-check-label" for="waNotif">WhatsApp reminders</label>
-        </div>
-      </div>
+      </label>
     </div>
-    <div class="card-footer bg-white d-flex justify-content-end">
-      <button class="btn btn-primary">Save settings</button>
+    <div class="toggle-list">
+      <label class="toggle-row">
+        <span>Dark mode</span>
+        <input type="checkbox" class="form-check-input" [(ngModel)]="settings.darkMode" />
+      </label>
+      <label class="toggle-row">
+        <span>Email notifications</span>
+        <input type="checkbox" class="form-check-input" [(ngModel)]="settings.emailNotifications" />
+      </label>
+      <label class="toggle-row">
+        <span>WhatsApp reminders</span>
+        <input type="checkbox" class="form-check-input" [(ngModel)]="settings.whatsappReminders" />
+      </label>
     </div>
-  </div>
-</app-dashboard-shell>
+    <div class="panel-actions">
+      <button type="button" class="btn btn-primary btn-sm" (click)="saveSettings()">Save settings</button>
+    </div>
+  </section>
+
+  <!-- Notifications -->
+  <section class="tab-panel card" *ngIf="activeTab === 'notification'">
+    <h3 class="panel-title">Notifications</h3>
+    <p class="panel-hint">Choose how you want to be alerted for appointments and messages.</p>
+    <div class="toggle-list">
+      <label class="toggle-row">
+        <span>New appointment requests</span>
+        <input type="checkbox" class="form-check-input" [(ngModel)]="settings.emailNotifications" />
+      </label>
+      <label class="toggle-row">
+        <span>WhatsApp reminders for patients</span>
+        <input type="checkbox" class="form-check-input" [(ngModel)]="settings.whatsappReminders" />
+      </label>
+    </div>
+    <div class="panel-actions">
+      <button type="button" class="btn btn-primary btn-sm" (click)="saveSettings()">Save settings</button>
+    </div>
+  </section>
+
+  <!-- Integrations -->
+  <section class="tab-panel integration-area" *ngIf="activeTab === 'integration'">
+    <div class="section-head">
+      <h3>Integration Settings</h3>
+      <p>Connect and manage third-party services to enhance your workflow.</p>
+    </div>
+
+    <div class="integration-grid">
+      <article class="integration-card" *ngFor="let item of integrations">
+        <div class="logo">{{ item.initials }}</div>
+        <h4>{{ item.name }}</h4>
+        <p>{{ item.description }}</p>
+        <div class="card-foot">
+          <span class="state" [class.connected]="item.connected">
+            {{ item.connected ? 'Connected' : 'Connect' }}
+          </span>
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="item.connected" />
+            <span></span>
+          </label>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Security -->
+  <section class="tab-panel card" *ngIf="activeTab === 'security'">
+    <h3 class="panel-title">Security</h3>
+    <p class="panel-hint">Two-factor authentication and session management (demo).</p>
+    <ul class="simple-list">
+      <li>Password last changed: <strong>45 days ago</strong></li>
+      <li>Active sessions: <strong>2 devices</strong></li>
+    </ul>
+    <div class="panel-actions">
+      <button type="button" class="btn btn-outline-secondary btn-sm">Change password</button>
+    </div>
+  </section>
+
+  <!-- Billing -->
+  <section class="tab-panel card" *ngIf="activeTab === 'billing'">
+    <h3 class="panel-title">Plan &amp; billing</h3>
+    <p class="panel-hint">Current plan and invoicing (demo data).</p>
+    <ul class="simple-list">
+      <li>Plan: <strong>Professional</strong></li>
+      <li>Next renewal: <strong>12 Apr 2026</strong></li>
+    </ul>
+    <div class="panel-actions">
+      <button type="button" class="btn btn-outline-primary btn-sm">Manage subscription</button>
+    </div>
+  </section>
+</section>

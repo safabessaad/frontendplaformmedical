@@ -5,7 +5,47 @@
   }
 
   .doctor-shell__metric-card {
-    border-radius: 0.5rem;
+    border-radius: 0.65rem;
+    transition: box-shadow 0.15s ease;
+
+    &:hover {
+      box-shadow: 0 0.35rem 1rem rgba(15, 23, 42, 0.08) !important;
+    }
+  }
+
+  .letter-spacing-sm {
+    letter-spacing: 0.04em;
+  }
+
+  .doctor-shell__metric-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.2rem;
+  }
+
+  .doctor-shell__metric-icon--primary {
+    background: rgba(64, 81, 137, 0.12);
+    color: #405189;
+  }
+
+  .doctor-shell__metric-icon--success {
+    background: rgba(25, 135, 84, 0.12);
+    color: #198754;
+  }
+
+  .doctor-shell__metric-icon--warning {
+    background: rgba(245, 166, 35, 0.18);
+    color: #d97706;
+  }
+
+  .doctor-shell__metric-icon--danger {
+    background: rgba(220, 53, 69, 0.12);
+    color: #dc3545;
+  }
+
+  .doctor-shell__metric-icon--muted {
+    background: rgba(108, 117, 125, 0.12);
+    color: #6c757d;
   }
 
   .card {

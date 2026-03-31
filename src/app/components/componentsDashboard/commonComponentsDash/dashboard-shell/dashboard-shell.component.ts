@@ -1,8 +1,12 @@
 import { Component, Input } from '@angular/core';
 
-interface ShellMetric {
+export interface ShellMetric {
   label: string;
   value: string;
+  /** Classe d’icône Remix Icon (ex. ri-medicine-bottle-line) */
+  icon?: string;
+  /** Variante couleur pour l’icône / accent */
+  variant?: 'primary' | 'success' | 'warning' | 'danger' | 'muted';
 }
 
 @Component({

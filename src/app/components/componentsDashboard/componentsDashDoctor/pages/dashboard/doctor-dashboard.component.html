@@ -1,0 +1,175 @@
+<div class="doctor-overview">
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+    <h4 class="mb-0 fw-semibold doctor-overview__title">Dashboard</h4>
+  </div>
+
+  <div class="row g-3 mb-4 doctor-overview__stat-row">
+    @for (card of statCards; track card.navKey) {
+      <div class="col-12 col-sm-6 col-xl-3 doctor-overview__stat-col">
+        <div
+          class="card border-0 shadow-sm h-100 doctor-stat-card doctor-stat-card--clickable"
+          role="button"
+          tabindex="0"
+          (click)="navigateStat(card.navKey)"
+          (keydown.enter)="navigateStat(card.navKey)"
+          (keydown.space)="$event.preventDefault(); navigateStat(card.navKey)"
+        >
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <div class="min-w-0">
+                <p class="text-muted text-uppercase fs-12 mb-1 letter-spacing-sm">{{ card.title }}</p>
+                <h3 class="mb-2 fw-semibold text-dark doctor-stat-card__value">{{ card.value }}</h3>
+                <span class="fs-12 text-success">
+                  {{ card.trend }}
+                  <span class="text-muted">{{ card.trendLabel }}</span>
+                </span>
+              </div>
+              <div class="flex-shrink-0">
+                <span
+                  class="doctor-stat-icon-wrap d-flex align-items-center justify-content-center rounded-3"
+                  [ngClass]="card.iconWrapClass"
+                >
+                  <i [class]="card.icon + ' doctor-stat-icon ' + card.iconColorClass"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="row g-3 align-items-stretch doctor-overview__main-row">
+    <div class="col-12 col-xl-8 doctor-overview__agenda-col">
+      <div class="card border-0 shadow-sm h-100 doctor-panel-card">
+        <div class="card-header border-0 bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-2 py-3 px-3">
+          <h5 class="card-title mb-0 fw-semibold">Today's Agenda</h5>
+          <div class="d-flex flex-wrap align-items-center gap-2 doctor-overview__agenda-actions">
+            <button type="button" class="btn btn-soft-primary btn-sm doctor-touch-target" (click)="navigateWeekView()">
+              <i class="ri-calendar-line me-1"></i> Week View
+            </button>
+            <button type="button" class="btn btn-primary btn-sm doctor-touch-target" (click)="navigateAddAppointment()">
+              <i class="ri-add-line me-1"></i> Add Appointment
+            </button>
+          </div>
+        </div>
+        <div class="card-body pt-0 px-3 pb-3">
+          <div class="doctor-agenda-list">
+            @for (item of agendaItems; track item.id) {
+              <div
+                class="doctor-agenda-row d-flex flex-wrap align-items-center justify-content-between gap-3 py-3 border-bottom doctor-agenda-row--clickable doctor-touch-target"
+                role="button"
+                tabindex="0"
+                (click)="onAgendaRowClick(item)"
+                (keydown.enter)="onAgendaRowClick(item)"
+                (keydown.space)="$event.preventDefault(); onAgendaRowClick(item)"
+              >
+                <div class="d-flex align-items-center gap-3 min-w-0">
+                  <span class="doctor-agenda-time text-muted fw-medium flex-shrink-0">{{ item.time }}</span>
+                  <div class="min-w-0">
+                    <button
+                      type="button"
+                      class="btn btn-link p-0 text-start text-decoration-none fw-semibold text-dark text-truncate doctor-agenda-patient-name"
+                      (click)="onAgendaPatientNameClick($event, item)"
+                    >
+                      {{ item.patientName }}
+                    </button>
+                    <div class="fs-13 text-muted">{{ item.type }}</div>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-auto">
+                  @if (item.status === 'Confirmed') {
+                    <span class="badge doctor-badge doctor-badge--confirmed">Confirmed</span>
+                  } @else if (item.status === 'Pending') {
+                    <span class="badge doctor-badge doctor-badge--pending">Pending</span>
+                  } @else {
+                    <span class="badge doctor-badge doctor-badge--cancelled">Cancelled</span>
+                  }
+                  <div class="doctor-agenda-actions d-flex align-items-center gap-1">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-ghost-secondary btn-icon rounded-circle doctor-touch-target"
+                      aria-label="Video"
+                      (click)="$event.stopPropagation(); navigateTeleconsultation()"
+                    >
+                      <i class="ri-video-line"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-ghost-secondary btn-icon rounded-circle doctor-touch-target"
+                      aria-label="Edit"
+                      (click)="$event.stopPropagation(); navigateRendezVous()"
+                    >
+                      <i class="ri-edit-line"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-ghost-secondary btn-icon rounded-circle doctor-touch-target"
+                      aria-label="More"
+                      (click)="onAgendaMoreClick($event)"
+                    >
+                      <i class="ri-more-2-fill"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-4 d-flex flex-column gap-3 doctor-overview__side-col">
+      <div class="card border-0 shadow-sm doctor-panel-card doctor-ai-card">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
+            <div>
+              <h5 class="fw-semibold mb-1">AI Consultation</h5>
+              <p class="text-muted fs-13 mb-0">Assist your visit with live transcription and suggestions.</p>
+            </div>
+            <span class="doctor-ai-badge rounded-pill">AI</span>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-primary doctor-touch-target" (click)="navigateAiAssistance()">
+              <i class="ri-mic-line me-2"></i> Start Recording
+            </button>
+            <button type="button" class="btn btn-soft-secondary doctor-touch-target" (click)="navigateAiAssistance()">
+              <i class="ri-robot-line me-2"></i> View AI Assistant
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm flex-grow-1 doctor-panel-card">
+        <div class="card-header border-0 bg-transparent py-3 px-3">
+          <h5 class="card-title mb-0 fw-semibold">Recent Patients</h5>
+        </div>
+        <div class="card-body pt-0 px-3 pb-3">
+          <div class="doctor-recent-list">
+            @for (p of recentPatients; track p.id) {
+              <button
+                type="button"
+                class="doctor-recent-row d-flex align-items-center justify-content-between gap-2 py-3 border-bottom text-decoration-none text-reset w-100 text-start bg-transparent border-start-0 border-end-0 border-top-0 doctor-touch-target"
+                (click)="onRecentPatientClick(p)"
+              >
+                <div class="d-flex align-items-center gap-3 min-w-0">
+                  <span
+                    class="doctor-avatar rounded-circle d-flex align-items-center justify-content-center fw-semibold"
+                    [ngClass]="p.avatarClass"
+                  >
+                    {{ p.initials }}
+                  </span>
+                  <div class="min-w-0">
+                    <div class="fw-semibold text-dark text-truncate">{{ p.name }}</div>
+                    <div class="fs-13 text-muted text-truncate">{{ p.condition }}</div>
+                  </div>
+                </div>
+                <i class="ri-arrow-right-s-line text-muted fs-18 flex-shrink-0"></i>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

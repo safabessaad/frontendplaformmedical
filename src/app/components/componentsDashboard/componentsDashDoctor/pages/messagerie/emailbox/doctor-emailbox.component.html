@@ -1,0 +1,27 @@
+<section class="emailbox-grid">
+  <article class="right card">
+    <header class="toolbar">
+      <div class="left-tools">
+        <input [(ngModel)]="searchTerm" type="text" placeholder="Search..." />
+      </div>
+    </header>
+
+    <div class="tabs">
+      <button type="button" [class.active]="selectedCategory === 'primary'" (click)="selectedCategory = 'primary'">Primary</button>
+      <button type="button" [class.active]="selectedCategory === 'social'" (click)="selectedCategory = 'social'">Social</button>
+      <button type="button" [class.active]="selectedCategory === 'promotions'" (click)="selectedCategory = 'promotions'">Promotions</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          <tr *ngFor="let mail of filteredEmails">
+            <td class="from">{{ mail.from }}</td>
+            <td class="subject">{{ mail.subject }}</td>
+            <td class="preview">{{ mail.preview }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>

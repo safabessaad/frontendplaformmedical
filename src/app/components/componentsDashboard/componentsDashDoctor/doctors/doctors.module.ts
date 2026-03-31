@@ -58,12 +58,12 @@ const routes: Routes = [
       },
       {
         path: 'add',
-        component: AddDoctorsComponent,
+        component: CreateDoctorsComponent,
         data: { title: 'Add doctor' }
       },
       {
         path: 'edit/:id',
-        component: UpdateDoctorsComponent,
+        component: CreateDoctorsComponent,
         data: { title: 'Edit doctor' }
       },
       {

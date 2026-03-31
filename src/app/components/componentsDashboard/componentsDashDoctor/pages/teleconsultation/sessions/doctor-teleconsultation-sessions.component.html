@@ -1,0 +1,116 @@
+<section class="tc-sessions">
+  <div class="tc-sessions__toolbar card">
+    <div class="tc-sessions__toolbar-main">
+      <h2 class="tc-sessions__title">Sessions</h2>
+      <p class="tc-sessions__subtitle">Planifiez et rejoignez vos rendez-vous vidéo avec les patients.</p>
+    </div>
+    <button type="button" class="btn btn-primary tc-sessions__cta" (click)="showForm = !showForm">
+      {{ showForm ? 'Fermer le formulaire' : 'Planifier une session' }}
+    </button>
+  </div>
+
+  <div class="tc-kpis">
+    <div class="tc-kpi">
+      <span class="tc-kpi__label">Aujourd’hui</span>
+      <strong class="tc-kpi__value">{{ kpiToday }}</strong>
+    </div>
+    <div class="tc-kpi tc-kpi--accent">
+      <span class="tc-kpi__label">En direct</span>
+      <strong class="tc-kpi__value">{{ kpiLive }}</strong>
+    </div>
+    <div class="tc-kpi">
+      <span class="tc-kpi__label">Planifiées</span>
+      <strong class="tc-kpi__value">{{ kpiPlanned }}</strong>
+    </div>
+    <div class="tc-kpi">
+      <span class="tc-kpi__label">Total</span>
+      <strong class="tc-kpi__value">{{ sessions.length }}</strong>
+    </div>
+  </div>
+
+  <div *ngIf="showForm" class="card tc-form-card">
+    <h3 class="tc-form-card__title">Nouvelle session</h3>
+    <form [formGroup]="sessionForm" (ngSubmit)="createSession()" class="tc-form">
+      <div class="row g-2 g-md-3">
+        <div class="col-md-4">
+          <label class="form-label small text-muted mb-1">Patient</label>
+          <input class="form-control" formControlName="patient" placeholder="Nom du patient" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted mb-1">Date</label>
+          <input class="form-control" type="date" formControlName="date" />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small text-muted mb-1">Heure</label>
+          <input class="form-control" type="time" formControlName="startTime" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted mb-1">Durée (min)</label>
+          <input class="form-control" type="number" min="5" formControlName="duration" />
+        </div>
+      </div>
+      <div class="tc-form__actions">
+        <button class="btn btn-primary" [disabled]="sessionForm.invalid" type="submit">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card tc-table-card">
+    <div class="tc-table-card__head">
+      <span class="tc-table-card__hint">Liste des sessions</span>
+    </div>
+    <div class="table-responsive tc-table-wrap">
+      <table class="table table-hover align-middle mb-0 tc-table">
+        <thead>
+          <tr>
+            <th scope="col">Patient</th>
+            <th scope="col">Session</th>
+            <th scope="col">Date &amp; heure</th>
+            <th scope="col">Durée</th>
+            <th scope="col">État</th>
+            <th scope="col" class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let session of sessions">
+            <td>
+              <div class="tc-patient">
+                <span class="tc-avatar" [attr.aria-label]="session.patient">{{ initials(session.patient) }}</span>
+                <div>
+                  <div class="tc-patient__name">{{ session.patient }}</div>
+                </div>
+              </div>
+            </td>
+            <td><code class="tc-code">{{ session.id }}</code></td>
+            <td>
+              <div class="tc-datetime">
+                <span>{{ session.date | date : 'dd/MM/yyyy' }}</span>
+                <small>{{ session.startTime }}</small>
+              </div>
+            </td>
+            <td>{{ session.duration }} min</td>
+            <td>
+              <span class="tc-badge" [ngClass]="sessionStatusClass(session.status)">{{ sessionStatusLabel(session.status) }}</span>
+            </td>
+            <td class="text-end">
+              <div class="tc-actions">
+                <a
+                  class="btn btn-sm btn-soft-primary"
+                  [href]="session.roomUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  [attr.aria-label]="'Rejoindre la salle ' + session.id"
+                >
+                  <span class="tc-actions__icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                  </span>
+                  Rejoindre
+                </a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

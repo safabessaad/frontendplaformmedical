@@ -11,7 +11,7 @@ export const MENU: MenuItem[] = [
     id: 2,
     label: 'Doctor dashboard',
     icon: 'ri-dashboard-2-line',
-    link: '/doctor/doctors/create'
+    link: '/doctor/dashboard'
   },
   {
     id: 3,
@@ -22,55 +22,41 @@ export const MENU: MenuItem[] = [
     subItems: [
       {
         id: 4,
-        label: 'Add patient',
-        icon: 'ri-user-add-line',
-        link: '/doctor/patients/add',
-        parentId: 3
-      },
-      {
-        id: 5,
-        label: 'Edit patient',
-        icon: 'ri-edit-2-line',
-        link: '/doctor/patients/edit',
-        parentId: 3
-      },
-      {
-        id: 6,
-        label: 'Create patient record',
-        icon: 'ri-file-add-line',
-        link: '/doctor/patients/create-record',
-        parentId: 3
-      },
-      {
-        id: 7,
         label: 'Patients',
         icon: 'ri-team-line',
         link: '/doctor/patients',
         parentId: 3
       },
       {
-        id: 8,
+        id: 5,
         label: 'Appointments',
         icon: 'ri-calendar-check-line',
         link: '/doctor/rendez-vous',
         parentId: 3
       },
       {
-        id: 9,
+        id: 6,
         label: 'Calendar',
         icon: 'ri-calendar-line',
         link: '/doctor/agenda',
         parentId: 3
       },
       {
-        id: 10,
+        id: 7,
+        label: 'Consultations',
+        icon: 'ri-stethoscope-line',
+        link: '/doctor/consultations',
+        parentId: 3
+      },
+      {
+        id: 8,
         label: 'Medical records',
         icon: 'ri-folder-open-line',
         link: '/doctor/dossier-medical',
         parentId: 3
       },
       {
-        id: 11,
+        id: 9,
         label: 'Prescriptions',
         icon: 'ri-file-text-line',
         link: '/doctor/ordonnances',
@@ -169,6 +155,13 @@ export const MENU: MenuItem[] = [
         label: 'Settings',
         icon: 'ri-settings-3-line',
         link: '/doctor/parametres',
+        parentId: 19
+      },
+      {
+        id: 25,
+        label: 'Profil',
+        icon: 'ri-user-3-line',
+        link: '/doctor/profil',
         parentId: 19
       }
     ]

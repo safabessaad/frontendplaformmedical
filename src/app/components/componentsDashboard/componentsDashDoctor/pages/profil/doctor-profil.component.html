@@ -1,0 +1,125 @@
+<section class="doctor-profile-page" *ngIf="profileForm">
+  <header class="page-head card">
+    <div>
+      <h1 class="page-title">Mon profil</h1>
+      <p class="page-sub">Informations visibles par le cabinet et utilisées pour les rendez-vous.</p>
+    </div>
+    <div class="page-head-actions">
+      <a
+        [routerLink]="['/doctor/doctors/edit', doctorRecordId]"
+        class="btn btn-primary btn-sm"
+      >
+        <i class="ri-edit-line align-middle me-1"></i>
+        Mettre à jour
+      </a>
+      <a routerLink="/doctor/parametres" class="btn btn-outline-secondary btn-sm">
+        <i class="ri-settings-3-line align-middle me-1"></i>
+        Paramètres
+      </a>
+    </div>
+  </header>
+
+  <div class="profile-grid">
+    <aside class="card identity-card">
+      <div class="avatar-wrap">
+        <div class="avatar" aria-hidden="true">{{ avatarInitials }}</div>
+        <button type="button" class="btn btn-soft-primary btn-sm">Changer la photo</button>
+      </div>
+      <h2 class="name">{{ profileForm.get('firstName')?.value }} {{ profileForm.get('lastName')?.value }}</h2>
+      <p class="role">{{ profileForm.get('specialty')?.value }}</p>
+      <ul class="meta-list">
+        <li>
+          <i class="ri-mail-line"></i>
+          <span>{{ profileForm.get('email')?.value }}</span>
+        </li>
+        <li>
+          <i class="ri-phone-line"></i>
+          <span>{{ profileForm.get('phone')?.value }}</span>
+        </li>
+        <li>
+          <i class="ri-hospital-line"></i>
+          <span>{{ profileForm.get('cabinetName')?.value }}</span>
+        </li>
+      </ul>
+      <div class="mini-stats">
+        <div class="mini-stat">
+          <span class="num">128</span>
+          <span class="lbl">Patients suivis</span>
+        </div>
+        <div class="mini-stat">
+          <span class="num">24</span>
+          <span class="lbl">RDV cette semaine</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="card form-card">
+      <h3 class="form-title">Modifier le profil</h3>
+      <form [formGroup]="profileForm" (ngSubmit)="save()">
+        <div class="row g-3">
+          <div class="col-md-2">
+            <label class="form-label">Civilité</label>
+            <select class="form-select form-select-sm" formControlName="civility">
+              <option value="Dr.">Dr.</option>
+              <option value="Pr.">Pr.</option>
+            </select>
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">Prénom</label>
+            <input type="text" class="form-control form-control-sm" formControlName="firstName" />
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">Nom</label>
+            <input type="text" class="form-control form-control-sm" formControlName="lastName" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Spécialité</label>
+            <input type="text" class="form-control form-control-sm" formControlName="specialty" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">RPPS</label>
+            <input
+              type="text"
+              class="form-control form-control-sm"
+              formControlName="rpps"
+              maxlength="11"
+              placeholder="11 chiffres"
+            />
+            <div class="invalid-hint" *ngIf="profileForm.get('rpps')?.invalid && profileForm.get('rpps')?.touched">
+              RPPS sur 11 chiffres.
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">E-mail professionnel</label>
+            <input type="email" class="form-control form-control-sm" formControlName="email" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Téléphone</label>
+            <input type="tel" class="form-control form-control-sm" formControlName="phone" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Nom du cabinet</label>
+            <input type="text" class="form-control form-control-sm" formControlName="cabinetName" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Adresse du cabinet</label>
+            <input type="text" class="form-control form-control-sm" formControlName="cabinetAddress" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Présentation courte</label>
+            <textarea class="form-control form-control-sm" rows="3" formControlName="bio"></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <div class="alert alert-success py-2 px-3 mb-0" *ngIf="saved" role="status">
+            Modifications enregistrées (démo).
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm" [disabled]="profileForm.invalid">
+            Enregistrer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

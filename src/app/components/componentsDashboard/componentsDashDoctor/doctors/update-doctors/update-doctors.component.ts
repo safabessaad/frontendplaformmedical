@@ -19,6 +19,6 @@ export class UpdateDoctorsComponent {
   constructor(private router: Router) {}
 
   update(): void {
-    this.router.navigate(['/doctor', 'doctors', 'create']);
+    this.router.navigate(['/doctor', 'dashboard']);
   }
 }

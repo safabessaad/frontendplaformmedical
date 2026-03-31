@@ -1,0 +1,32 @@
+<section class="chat-grid">
+  <aside class="sidebar card">
+    <div class="search">
+      <input type="text" placeholder="Rechercher contact..." />
+    </div>
+    <div class="contacts">
+      <button type="button" *ngFor="let contact of contacts" class="contact" [class.active]="contact.active">
+        <div>
+          <strong>{{ contact.name }}</strong>
+          <small>{{ contact.status }}</small>
+        </div>
+        <span *ngIf="contact.unread > 0">{{ contact.unread }}</span>
+      </button>
+    </div>
+  </aside>
+
+  <article class="chat card">
+    <header class="chat-head">
+      <div><h3>Lisa Parker</h3><small>Patient en ligne</small></div>
+      <button type="button">Info</button>
+    </header>
+    <div class="messages">
+      <div class="msg" *ngFor="let message of messages" [class.me]="message.author === 'medecin'">
+        <p>{{ message.text }}</p><small>{{ message.time }}</small>
+      </div>
+    </div>
+    <footer class="send-box">
+      <input [(ngModel)]="draft" type="text" placeholder="Ecrire votre message..." />
+      <button type="button" (click)="send()">Envoyer</button>
+    </footer>
+  </article>
+</section>

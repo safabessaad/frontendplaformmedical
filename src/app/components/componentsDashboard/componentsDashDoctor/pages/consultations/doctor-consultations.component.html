@@ -1,0 +1,105 @@
+<section class="consultations-layout p-3">
+  <article class="card main-card">
+    <header class="head-row">
+      <div>
+        <h2>Consultations</h2>
+        <p>Saisie des symptomes, diagnostic, compte rendu et ordonnance.</p>
+      </div>
+      <button type="button" class="btn btn-primary" (click)="openNewConsultation()">
+        Nouvelle consultation
+      </button>
+    </header>
+
+    <div class="kpi-row">
+      <div class="kpi"><strong>{{ totalConsultations }}</strong><span>Total consultations</span></div>
+      <div class="kpi"><strong>{{ urgentConsultations }}</strong><span>Cas urgents</span></div>
+      <div class="kpi"><strong>{{ highRiskPatients }}</strong><span>Patients a risque eleve</span></div>
+      <div class="kpi"><strong>{{ todayConsultations }}</strong><span>Aujourd'hui</span></div>
+    </div>
+
+    <div class="filters">
+      <input type="search" [formControl]="searchControl" placeholder="Rechercher par patient ou diagnostic..." />
+      <select [formControl]="riskFilterControl">
+        <option value="Tous">Tous les niveaux</option>
+        <option value="Faible">Faible</option>
+        <option value="Moyen">Moyen</option>
+        <option value="Eleve">Eleve</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Date</th><th>Patient</th><th>Diagnostic</th><th>Priorite</th><th>Risque</th><th>Suivi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let consultation of filteredConsultations" [class.active]="selectedConsultation?.id === consultation.id" (click)="selectConsultation(consultation)">
+            <td>{{ consultation.date }}</td>
+            <td>{{ consultation.patient }}</td>
+            <td>{{ consultation.diagnosis }}</td>
+            <td><span class="badge" [class.urgent]="consultation.priority === 'Urgente'">{{ consultation.priority }}</span></td>
+            <td><span class="risk" [class]="riskClass(consultation.risk)">{{ consultation.risk }}</span></td>
+            <td>{{ consultation.followUpDate || '-' }}</td>
+          </tr>
+          <tr *ngIf="filteredConsultations.length === 0"><td colspan="6" class="empty-row">Aucune consultation trouvee.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="card side-card">
+    <form [formGroup]="consultationForm" (ngSubmit)="saveConsultation()" class="form-grid">
+      <h3>{{ editingId ? 'Modifier consultation' : 'Nouvelle consultation' }}</h3>
+      <label>Patient</label>
+      <input type="text" formControlName="patient" placeholder="Nom complet patient" />
+      <div class="row2">
+        <div><label>Date consultation</label><input type="date" formControlName="date" /></div>
+        <div><label>Date suivi</label><input type="date" formControlName="followUpDate" /></div>
+      </div>
+      <div class="row2">
+        <div><label>Priorite</label><select formControlName="priority"><option value="Normale">Normale</option><option value="Urgente">Urgente</option></select></div>
+        <div><label>Niveau de risque</label><select formControlName="risk"><option value="Faible">Faible</option><option value="Moyen">Moyen</option><option value="Eleve">Eleve</option></select></div>
+      </div>
+      <label>Symptomes</label>
+      <textarea rows="3" formControlName="symptoms" placeholder="Douleur thoracique, fatigue, vertige..."></textarea>
+      <div class="ai-box">
+        <div><p class="ai-title">Aide IA (simulation locale)</p><small>Suggestion basee sur les symptomes saisis.</small></div>
+        <button type="button" class="btn btn-light" (click)="analyzeSymptoms()">Analyser</button>
+      </div>
+      <p *ngIf="aiSuggestion" class="ai-result">{{ aiSuggestion }}</p>
+      <label>Diagnostic</label>
+      <textarea rows="3" formControlName="diagnosis" placeholder="Diagnostic medical"></textarea>
+      <label>Compte rendu medical</label>
+      <textarea rows="4" formControlName="report" placeholder="Compte rendu detaille..."></textarea>
+      <label>Ordonnance</label>
+      <textarea rows="3" formControlName="prescription" placeholder="Medicaments + posologie"></textarea>
+      <div class="docs-box">
+        <label>Documents medicaux (PDF / images)</label>
+        <input type="file" multiple accept=".pdf,image/*" (change)="onFileSelected($event)" />
+        <ul *ngIf="selectedAttachments.length > 0">
+          <li *ngFor="let fileName of selectedAttachments">{{ fileName }}</li>
+        </ul>
+      </div>
+      <label class="consent-row">
+        <input type="checkbox" formControlName="consent" />
+        <span>Consentement patient et confidentialite verifies</span>
+      </label>
+      <div class="actions">
+        <button type="submit" class="btn btn-primary" [disabled]="consultationForm.invalid">{{ editingId ? 'Mettre a jour' : 'Enregistrer' }}</button>
+        <button type="button" class="btn btn-light" (click)="resetForm()">Vider</button>
+      </div>
+    </form>
+
+    <section *ngIf="selectedConsultation" class="detail-box">
+      <h3>Resume consultation</h3>
+      <p><strong>Patient:</strong> {{ selectedConsultation.patient }}</p>
+      <p><strong>Symptomes:</strong> {{ selectedConsultation.symptoms }}</p>
+      <p><strong>Diagnostic:</strong> {{ selectedConsultation.diagnosis }}</p>
+      <p><strong>Compte rendu:</strong> {{ selectedConsultation.report }}</p>
+      <p><strong>Ordonnance:</strong> {{ selectedConsultation.prescription || 'Aucune' }}</p>
+      <p><strong>Documents:</strong> {{ selectedConsultation.attachments.length }}</p>
+    </section>
+  </article>
+</section>

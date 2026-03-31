@@ -1,41 +1,44 @@
-<app-dashboard-shell
-  [title]="'Calendar'"
-  [subtitle]="'Weekly planning with quick visibility on today slots.'"
-  [metrics]="[
-    { label: 'Slots today', value: '11' },
-    { label: 'No-show risk', value: '2' },
-    { label: 'Teleconsultations', value: '3' }
-  ]"
-  [secondaryMetrics]="[
-    { label: 'Rooms active', value: '2' },
-    { label: 'Average slot', value: '30m' },
-    { label: 'Urgent inserts', value: '1' },
-    { label: 'Reminders sent', value: '18' }
-  ]"
->
-  <div shell-actions>
-    <button class="btn btn-primary">Sync agenda</button>
-  </div>
-  <div class="card border-0 shadow-sm">
-    <div class="card-body">
-      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-        <label class="mb-0 d-flex align-items-center gap-2">
-          <span class="text-muted">Date:</span>
-          <input type="date" class="form-control" [(ngModel)]="selectedDate" />
-        </label>
-        <button class="btn btn-primary">Add appointment</button>
+<section class="calendar-layout">
+  <article class="card main-card p-3">
+    <header class="card-header">
+      <div>
+        <h2>Calendrier medical</h2>
+        <p>Gestion des rendez-vous et disponibilites du cabinet.</p>
       </div>
-      <div class="list-group">
-        <div class="list-group-item" *ngFor="let slot of slots">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <div class="fw-semibold">{{ slot.time }} - {{ slot.patient }}</div>
-              <small class="text-muted">{{ slot.room }}</small>
-            </div>
-            <app-status-badge [status]="'Scheduled'"></app-status-badge>
-          </div>
+    </header>
+
+    <app-calendar-legend></app-calendar-legend>
+
+    <full-calendar *ngIf="isBrowser" [options]="calendarOptions"></full-calendar>
+    <p *ngIf="!isBrowser" class="ssr-note">Le calendrier interactif est disponible cote navigateur.</p>
+  </article>
+
+  <article class="card side-card p-3 mt-3">
+    <h3>{{ editingEventId ? 'Modifier un rendez-vous' : 'Nouveau rendez-vous' }}</h3>
+    <form [formGroup]="eventForm" (ngSubmit)="saveEvent()">
+      <input type="text" class="form-control mb-2" formControlName="title" placeholder="Consultation generale" />
+      <input type="text" class="form-control mb-2" formControlName="patientName" placeholder="Nom du patient" />
+      <div class="row g-2 mb-2">
+        <div class="col"><input type="date" class="form-control" formControlName="date" /></div>
+        <div class="col">
+          <select class="form-select" formControlName="category">
+            <option value="Consultation">Consultation</option>
+            <option value="Suivi">Suivi</option>
+            <option value="Urgence">Urgence</option>
+            <option value="Teleconsultation">Teleconsultation</option>
+          </select>
         </div>
       </div>
-    </div>
-  </div>
-</app-dashboard-shell>
+      <div class="row g-2 mb-2">
+        <div class="col"><input type="time" class="form-control" formControlName="startTime" /></div>
+        <div class="col"><input type="time" class="form-control" formControlName="endTime" /></div>
+      </div>
+      <input type="text" class="form-control mb-2" formControlName="location" placeholder="Cabinet 1 / Visio" />
+      <textarea rows="3" class="form-control mb-2" formControlName="description" placeholder="Notes consultation"></textarea>
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary" [disabled]="eventForm.invalid">{{ editingEventId ? 'Mettre a jour' : 'Ajouter' }}</button>
+        <button type="button" class="btn btn-light" (click)="resetForm()">Vider</button>
+      </div>
+    </form>
+  </article>
+</section>

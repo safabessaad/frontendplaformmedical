@@ -1,52 +1,90 @@
-<app-dashboard-shell
-  [title]="'Patients'"
-  [subtitle]="'Manage patient profiles and quickly access patient records.'"
-  [metrics]="[
-    { label: 'Total Patients', value: '1,248' },
-    { label: 'New This Week', value: '34' },
-    { label: 'Chronic Cases', value: '286' }
-  ]"
-  [secondaryMetrics]="[
-    { label: 'Critical follow-up', value: '14' },
-    { label: 'Next 7 days revisits', value: '41' },
-    { label: 'Teleconsult eligible', value: '76' },
-    { label: 'Missing records', value: '8' }
-  ]"
->
-  <div shell-actions>
-    <button class="btn btn-soft-primary" (click)="navigateTo('add')">Add patient</button>
-  </div>
-  <div class="card border-0 shadow-sm">
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
-        <input class="form-control w-auto" style="min-width: 260px" placeholder="Search by name or ID" [(ngModel)]="search" />
-        <div class="d-flex gap-2">
-          <button class="btn btn-soft-primary" (click)="navigateTo('add')">Add patient</button>
-          <button class="btn btn-soft-secondary" (click)="navigateTo('edit')">Edit patient</button>
-          <button class="btn btn-primary" (click)="navigateTo('create-record')">Create record</button>
+<section class="patients-layout">
+  <article class="card list-card">
+    <header class="header-row">
+      <div>
+        <h2>Patients</h2>
+        <p>CRUD patients organisee avec details et niveau de risque.</p>
+      </div>
+      <button type="button" class="btn btn-primary" (click)="toggleForm()">
+        {{ showForm ? 'Fermer le formulaire' : 'Nouveau patient' }}
+      </button>
+    </header>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Age</th>
+            <th>Telephone</th>
+            <th>Maladie chronique</th>
+            <th>Derniere visite</th>
+            <th>Prochain RDV</th>
+            <th>Risque</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let patient of patients" (click)="selectPatient(patient)">
+            <td>{{ patient.firstName }} {{ patient.lastName }}</td>
+            <td>{{ patient.age }}</td>
+            <td>{{ patient.phone }}</td>
+            <td>{{ patient.chronicDisease }}</td>
+            <td>{{ patient.lastVisitDate }}</td>
+            <td>{{ patient.nextAppointmentDate }}</td>
+            <td>
+              <app-patient-risk-badge [risk]="patient.riskLevel"></app-patient-risk-badge>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="card side-card">
+    <section *ngIf="selectedPatient" class="detail-box">
+      <div class="detail-head">
+        <h3>Fiche patient</h3>
+        <div class="detail-actions">
+          <button class="btn btn-light" type="button" (click)="editSelectedPatient()">Modifier</button>
+          <button class="btn btn-danger" type="button" (click)="deleteSelectedPatient()">Supprimer</button>
         </div>
       </div>
+      <p><strong>ID:</strong> {{ selectedPatient.id }}</p>
+      <p><strong>Nom:</strong> {{ selectedPatient.firstName }} {{ selectedPatient.lastName }}</p>
+      <p><strong>Sexe:</strong> {{ selectedPatient.gender }}</p>
+      <p><strong>Groupe sanguin:</strong> {{ selectedPatient.bloodGroup }}</p>
+      <p><strong>Maladie chronique:</strong> {{ selectedPatient.chronicDisease }}</p>
+      <p><strong>Prochain rendez-vous:</strong> {{ selectedPatient.nextAppointmentDate }}</p>
+    </section>
 
-      <div class="table-responsive">
-        <table class="table align-middle mb-0">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Condition</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let p of filteredPatients">
-              <td>{{ p.id }}</td>
-              <td class="fw-semibold">{{ p.name }}</td>
-              <td>{{ p.phone }}</td>
-              <td>{{ p.chronic }}</td>
-            </tr>
-          </tbody>
-        </table>
+    <form *ngIf="showForm" [formGroup]="patientForm" (ngSubmit)="createPatient()" class="form-box">
+      <h3>{{ editingId ? 'Modifier patient' : 'Nouveau patient' }}</h3>
+      <input type="text" placeholder="Prenom" formControlName="firstName" />
+      <input type="text" placeholder="Nom" formControlName="lastName" />
+      <div class="row2">
+        <input type="number" placeholder="Age" formControlName="age" />
+        <select formControlName="gender">
+          <option value="F">F</option>
+          <option value="M">M</option>
+        </select>
       </div>
-    </div>
-  </div>
-</app-dashboard-shell>
+      <input type="text" placeholder="Telephone" formControlName="phone" />
+      <div class="row2">
+        <input type="text" placeholder="Groupe sanguin" formControlName="bloodGroup" />
+        <select formControlName="riskLevel">
+          <option value="low">Risque faible</option>
+          <option value="medium">Risque moyen</option>
+          <option value="high">Risque eleve</option>
+        </select>
+      </div>
+      <input type="text" placeholder="Maladie chronique" formControlName="chronicDisease" />
+      <div class="row2">
+        <input type="date" formControlName="lastVisitDate" />
+        <input type="date" formControlName="nextAppointmentDate" />
+      </div>
+      <button class="btn btn-primary" type="submit" [disabled]="patientForm.invalid">
+        {{ editingId ? 'Mettre a jour' : 'Enregistrer' }}
+      </button>
+    </form>
+  </article>
+</section>

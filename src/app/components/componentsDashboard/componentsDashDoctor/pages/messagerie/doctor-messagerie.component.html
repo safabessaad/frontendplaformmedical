@@ -1,27 +1,18 @@
-<app-dashboard-shell
-  [title]="'Messaging'"
-  [subtitle]="'Secure exchanges with patients and medical staff.'"
-  [secondaryMetrics]="[
-    { label: 'Unread', value: '5' },
-    { label: 'Answered today', value: '18' },
-    { label: 'Avg response', value: '9m' },
-    { label: 'Escalations', value: '1' }
-  ]"
->
-  <div shell-actions>
-    <button class="btn btn-light">New message</button>
-  </div>
-  <div class="card border-0 shadow-sm">
-    <div class="card-body">
-      <div class="list-group">
-        <div class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let t of threads">
-          <div>
-            <h6 class="mb-1">{{ t.from }}</h6>
-            <p class="mb-0 text-muted">{{ t.subject }}</p>
-          </div>
-          <app-status-badge [status]="'Pending'" *ngIf="t.unread"></app-status-badge>
-        </div>
-      </div>
+<section class="communication-page p-3">
+  <header class="header d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h2>Communication medicale</h2>
+      <p>Messagerie interne du cabinet, email patient et canal WhatsApp.</p>
     </div>
-  </div>
-</app-dashboard-shell>
+  </header>
+
+  <nav class="tabs nav nav-pills mb-3">
+    <a class="nav-link" routerLink="emailbox" routerLinkActive="active">Emailbox</a>
+    <a class="nav-link" routerLink="chat" routerLinkActive="active">Chat</a>
+    <a class="nav-link" routerLink="whatsapp" routerLinkActive="active">WhatsApp</a>
+  </nav>
+
+  <article class="content">
+    <router-outlet></router-outlet>
+  </article>
+</section>

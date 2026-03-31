@@ -1,29 +1,124 @@
-<app-dashboard-shell
-  [title]="'Medical records'"
-  [subtitle]="'Access patient history, diagnosis and continuity notes.'"
-  [metrics]="[
-    { label: 'Open records', value: '58' },
-    { label: 'Updated today', value: '12' },
-    { label: 'Pending review', value: '4' }
-  ]"
-  [secondaryMetrics]="[
-    { label: 'Shared externally', value: '7' },
-    { label: 'Attachments', value: '93' },
-    { label: 'Critical flags', value: '5' },
-    { label: 'Archived', value: '40' }
-  ]"
->
-  <div shell-actions>
-    <button class="btn btn-soft-primary">Export summary</button>
-  </div>
-  <div class="card border-0 shadow-sm">
-    <div class="card-body">
-      <div class="timeline-alt">
-        <div class="mb-3 pb-2 border-bottom" *ngFor="let rec of records">
-          <h6 class="mb-1">{{ rec.date }} - {{ rec.diagnosis }}</h6>
-          <p class="text-muted mb-0">{{ rec.note }}</p>
+<section class="records-layout">
+  <article class="card main-card">
+    <header class="head-row">
+      <div>
+        <h2>Dossiers medicaux</h2>
+        <p>Dossier medical electronique centralise par patient, historique et documents.</p>
+      </div>
+      <button type="button" class="btn btn-primary" (click)="openCreateForm()">
+        Nouveau dossier
+      </button>
+    </header>
+
+    <div class="kpi-row">
+      <div class="kpi"><strong>{{ records.length }}</strong><span>Total dossiers</span></div>
+      <div class="kpi"><strong>{{ highRiskCount }}</strong><span>Risque eleve</span></div>
+      <div class="kpi"><strong>{{ restrictedCount }}</strong><span>Acces restreint</span></div>
+      <div class="kpi"><strong>{{ totalDocuments }}</strong><span>Documents</span></div>
+    </div>
+
+    <div class="filters">
+      <input type="search" [(ngModel)]="searchTerm" [ngModelOptions]="{ standalone: true }" placeholder="Rechercher patient, maladie chronique..." />
+      <select [(ngModel)]="riskFilter" [ngModelOptions]="{ standalone: true }">
+        <option value="Tous">Tous les risques</option>
+        <option value="Faible">Faible</option>
+        <option value="Moyen">Moyen</option>
+        <option value="Eleve">Eleve</option>
+      </select>
+      <select [(ngModel)]="accessFilter" [ngModelOptions]="{ standalone: true }">
+        <option value="Tous">Tous les acces</option>
+        <option value="Restreint">Restreint</option>
+        <option value="Standard">Standard</option>
+        <option value="Complet">Complet</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Patient</th><th>Groupe sanguin</th><th>Maladies chroniques</th><th>Risque</th><th>Acces</th><th>Maj</th><th>Docs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of filteredRecords" [class.active]="selectedRecord?.id === record.id" (click)="selectRecord(record)">
+            <td>{{ record.patient }}</td>
+            <td>{{ record.bloodGroup }}</td>
+            <td>{{ record.chronicDiseases || 'Aucune' }}</td>
+            <td><span class="risk" [class]="riskClass(record.risk)">{{ record.risk }}</span></td>
+            <td>{{ record.access }}</td>
+            <td>{{ record.lastUpdate }}</td>
+            <td>{{ record.documents.length }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="card side-card">
+    <section *ngIf="selectedRecord" class="detail-box">
+      <header class="detail-head">
+        <h3>Dossier patient</h3>
+        <div class="detail-actions">
+          <button type="button" class="btn btn-light d-inline-flex align-items-center gap-1" (click)="exportPdf()">
+            <i class="ri-file-pdf-line"></i>
+            Export PDF
+          </button>
+          <button type="button" class="btn btn-light d-inline-flex align-items-center gap-1" (click)="exportExcel()">
+            <i class="ri-file-excel-2-line"></i>
+            Export Excel
+          </button>
+        </div>
+      </header>
+      <p><strong>Patient:</strong> {{ selectedRecord.patient }}</p>
+      <p><strong>Date naissance:</strong> {{ selectedRecord.birthDate }}</p>
+      <p><strong>Allergies:</strong> {{ selectedRecord.allergies || 'Aucune' }}</p>
+      <p><strong>Notes:</strong> {{ selectedRecord.notes || 'Aucune note' }}</p>
+      <div class="subsection">
+        <h4>Historique medical</h4>
+        <ul><li *ngFor="let item of selectedRecord.history">{{ item }}</li></ul>
+      </div>
+      <div class="subsection">
+        <h4>Documents</h4>
+        <ul *ngIf="selectedRecord.documents.length > 0">
+          <li *ngFor="let doc of selectedRecord.documents">{{ doc.name }} - {{ doc.type }} - {{ doc.addedAt }}</li>
+        </ul>
+        <div class="doc-upload">
+          <select [(ngModel)]="newDocumentType" [ngModelOptions]="{ standalone: true }">
+            <option value="Analyse">Analyse</option>
+            <option value="Ordonnance">Ordonnance</option>
+            <option value="Imagerie">Imagerie</option>
+            <option value="Compte rendu">Compte rendu</option>
+          </select>
+          <input type="file" accept=".pdf,image/*" (change)="onDocumentPicked($event)" />
         </div>
       </div>
-    </div>
-  </div>
-</app-dashboard-shell>
+    </section>
+
+    <form [formGroup]="recordForm" (ngSubmit)="saveRecord()" class="record-form">
+      <h3>{{ editingId ? 'Modifier dossier' : 'Nouveau dossier' }}</h3>
+      <input type="text" formControlName="patient" placeholder="Nom complet patient" />
+      <div class="row2">
+        <input type="date" formControlName="birthDate" />
+        <input type="text" formControlName="bloodGroup" placeholder="Groupe sanguin (A+, O-...)" />
+      </div>
+      <input type="text" formControlName="allergies" placeholder="Allergies" />
+      <input type="text" formControlName="chronicDiseases" placeholder="Maladies chroniques" />
+      <div class="row2">
+        <select formControlName="risk"><option value="Faible">Risque faible</option><option value="Moyen">Risque moyen</option><option value="Eleve">Risque eleve</option></select>
+        <select formControlName="access"><option value="Restreint">Acces restreint</option><option value="Standard">Acces standard</option><option value="Complet">Acces complet</option></select>
+      </div>
+      <textarea rows="3" formControlName="notes" placeholder="Notes et observations"></textarea>
+      <textarea rows="3" formControlName="historyLine" placeholder="Ajouter une ligne d'historique medical"></textarea>
+      <label class="consent">
+        <input type="checkbox" formControlName="consentChecked" />
+        <span>Confidentialite et consentement verifies</span>
+      </label>
+      <div class="actions">
+        <button type="submit" class="btn btn-primary" [disabled]="recordForm.invalid">{{ editingId ? 'Mettre a jour' : 'Enregistrer' }}</button>
+        <button type="button" class="btn btn-light" (click)="resetForm()">Vider</button>
+      </div>
+    </form>
+    <p *ngIf="exportMessage" class="export-message">{{ exportMessage }}</p>
+  </article>
+</section>

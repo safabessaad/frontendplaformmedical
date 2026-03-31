@@ -1,0 +1,11 @@
+.calendar-layout { display: grid; gap: 1rem; grid-template-columns: 1.7fr 1fr; align-items: start; }
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05); }
+.main-card { min-height: 640px; }
+.card-header { margin-bottom: 0.55rem; }
+.card-header h2 { margin: 0; font-size: 1.15rem; }
+.card-header p { margin: 0.25rem 0 0; color: #64748b; font-size: 0.88rem; }
+.side-card h3 { margin: 0 0 0.85rem; font-size: 1rem; }
+form { display: grid; gap: 0.5rem; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+@media (max-width: 1200px) { .calendar-layout { grid-template-columns: 1fr; } }
+.ssr-note { color: #64748b; font-size: 0.9rem; }

@@ -1,0 +1,8 @@
+.communication-page { display: grid; gap: 0.8rem; }
+.header { background: #fff; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.9rem; display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; }
+h2 { margin: 0; font-size: 1.05rem; }
+p { margin: 0.2rem 0 0; color: #64748b; font-size: 0.82rem; }
+.tabs { display: flex; gap: 0.45rem; background: #fff; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.35rem; flex-wrap: wrap; }
+.tabs a { text-decoration: none; color: #334155; border-radius: 0.35rem; padding: 0.45rem 0.65rem; font-size: 0.82rem; }
+.tabs a.active { background: #405189; color: #fff; }
+.content { min-height: 300px; }

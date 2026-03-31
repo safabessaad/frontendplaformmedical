@@ -1,0 +1,14 @@
+.emailbox-grid { display: grid; grid-template-columns: 1fr; gap: 0.8rem; }
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.8rem; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; }
+.left-tools input[type='text'] { flex: 1; border: 1px solid #e2e8f0; border-radius: 0.35rem; background: #f8fafc; height: 34px; padding: 0 0.7rem; font-size: 0.8rem; min-width: 120px; }
+.tabs { border-bottom: 1px solid #f1f5f9; display: flex; gap: 0.35rem; margin-bottom: 0.45rem; }
+.tabs button { border: 0; border-bottom: 2px solid transparent; background: transparent; color: #64748b; padding: 0.45rem 0.3rem; font-size: 0.8rem; cursor: pointer; }
+.tabs button.active { color: #0ab39c; border-bottom-color: #0ab39c; font-weight: 600; }
+.table-wrap { overflow: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
+tr { border-bottom: 1px solid #f1f5f9; }
+td { padding: 0.52rem 0.35rem; font-size: 0.79rem; color: #334155; vertical-align: middle; }
+td.from { width: 165px; }
+td.subject { width: 180px; font-weight: 600; color: #0f172a; }
+td.preview { color: #64748b; }

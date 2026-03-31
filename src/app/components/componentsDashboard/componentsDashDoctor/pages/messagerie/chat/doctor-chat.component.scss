@@ -1,0 +1,15 @@
+.chat-grid { display: grid; grid-template-columns: 290px 1fr; gap: 0.8rem; min-height: 500px; }
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.8rem; }
+.sidebar { display: flex; flex-direction: column; gap: 0.6rem; }
+.search input, .send-box input { width: 100%; border: 1px solid #e2e8f0; border-radius: 0.35rem; background: #f8fafc; height: 36px; padding: 0 0.7rem; font-size: 0.8rem; }
+.contacts { display: grid; gap: 0.35rem; overflow: auto; }
+.contact { border: 1px solid #e2e8f0; background: #fff; border-radius: 0.4rem; padding: 0.5rem 0.6rem; display: flex; justify-content: space-between; align-items: center; text-align: left; cursor: pointer; }
+.contact.active { border-color: #67e8f9; background: #ecfeff; }
+.chat { display: grid; grid-template-rows: auto 1fr auto; gap: 0.6rem; }
+.chat-head { border-bottom: 1px solid #f1f5f9; padding-bottom: 0.55rem; display: flex; justify-content: space-between; align-items: center; }
+.messages { display: grid; gap: 0.5rem; align-content: start; overflow: auto; }
+.msg { max-width: 72%; border: 1px solid #e2e8f0; border-radius: 0.45rem; background: #fff; padding: 0.5rem 0.6rem; }
+.msg.me { margin-left: auto; background: #ccfbf1; border-color: #99f6e4; }
+.send-box { border-top: 1px solid #f1f5f9; padding-top: 0.55rem; display: grid; grid-template-columns: 1fr auto; gap: 0.45rem; }
+.send-box button { border: 0; border-radius: 0.35rem; background: #0ab39c; color: #fff; padding: 0.4rem 0.75rem; font-size: 0.8rem; cursor: pointer; }
+@media (max-width: 992px) { .chat-grid { grid-template-columns: 1fr; } }

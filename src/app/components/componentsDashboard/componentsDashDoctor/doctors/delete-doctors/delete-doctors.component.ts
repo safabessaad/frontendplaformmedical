@@ -20,6 +20,6 @@ export class DeleteDoctorsComponent {
   }
 
   done(): void {
-    this.router.navigate(['/doctor', 'doctors', 'create']);
+    this.router.navigate(['/doctor', 'dashboard']);
   }
 }

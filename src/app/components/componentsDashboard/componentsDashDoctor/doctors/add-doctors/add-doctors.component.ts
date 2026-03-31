@@ -22,6 +22,6 @@ export class AddDoctorsComponent {
     if (!this.doctor.firstName || !this.doctor.lastName || !this.doctor.email) {
       return;
     }
-    this.router.navigate(['/doctor', 'doctors', 'create']);
+    this.router.navigate(['/doctor', 'dashboard']);
   }
 }

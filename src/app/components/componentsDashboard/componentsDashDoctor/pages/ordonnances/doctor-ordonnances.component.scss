@@ -1,0 +1,96 @@
+:host {
+  display: block;
+}
+
+.fs-13 {
+  font-size: 0.8125rem;
+}
+
+.fs-12 {
+  font-size: 0.75rem;
+}
+
+.ordonnances-actions .btn {
+  min-height: 2.25rem;
+}
+
+.ordonnances-toolbar .form-control,
+.ordonnances-toolbar .form-select {
+  border-radius: 0.45rem;
+}
+
+.ordonnances-table-card {
+  border-radius: 0.65rem;
+  overflow: hidden;
+}
+
+.ordonnances-table {
+  --bs-table-hover-bg: rgba(64, 81, 137, 0.04);
+
+  thead th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--vz-secondary-color, #878a99);
+    border-bottom-width: 1px;
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    vertical-align: middle;
+    font-size: 0.875rem;
+  }
+
+  .ordonnances-row:hover td {
+    background: rgba(64, 81, 137, 0.03);
+  }
+}
+
+.rx-badge {
+  font-weight: 500;
+  padding: 0.35em 0.75em;
+  font-size: 0.72rem;
+}
+
+.rx-badge--active {
+  background: rgba(25, 135, 84, 0.12);
+  color: #198754;
+}
+
+.rx-badge--expiring {
+  background: rgba(245, 166, 35, 0.18);
+  color: #b45309;
+}
+
+.rx-badge--alert {
+  background: rgba(220, 53, 69, 0.12);
+  color: #c82333;
+}
+
+.rx-badge--expired {
+  background: rgba(108, 117, 125, 0.15);
+  color: #495057;
+}
+
+.btn-icon {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 767.98px) {
+  .ordonnances-table {
+    font-size: 0.8rem;
+  }
+
+  .ordonnances-table .btn-sm {
+    font-size: 0.7rem;
+  }
+}

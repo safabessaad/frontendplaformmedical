@@ -1,29 +1,25 @@
-<app-dashboard-shell
-  [title]="'Teleconsultation'"
-  [subtitle]="'Secure remote consultations with queued sessions.'"
-  [secondaryMetrics]="[
-    { label: 'Sessions today', value: '7' },
-    { label: 'Average duration', value: '22m' },
-    { label: 'Follow-up needed', value: '3' },
-    { label: 'Missed calls', value: '1' }
-  ]"
->
-  <div shell-actions>
-    <button class="btn btn-soft-primary">Open virtual room</button>
-  </div>
-  <div class="card border-0 shadow-sm">
-    <div class="card-body">
-      <div class="list-group">
-        <div class="list-group-item" *ngFor="let item of queue">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="mb-1">{{ item.patient }} - {{ item.time }}</h6>
-              <small class="text-muted">{{ item.reason }}</small>
-            </div>
-            <button class="btn btn-sm btn-primary">Start call</button>
-          </div>
-        </div>
-      </div>
+<section class="tc-shell p-3">
+  <header class="tc-header card">
+    <div class="tc-header__text">
+      <h1 class="tc-header__title">Téléconsultation</h1>
+      <p class="tc-header__desc">Sessions vidéo sécurisées et suivi post-consultation, au même endroit.</p>
     </div>
+    <nav class="tc-tabs" aria-label="Sections téléconsultation">
+      <a class="tc-tab" routerLink="sessions" routerLinkActive="is-active">
+        <span class="tc-tab__icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        </span>
+        Sessions
+      </a>
+      <a class="tc-tab" routerLink="follow-up" routerLinkActive="is-active">
+        <span class="tc-tab__icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+        </span>
+        Suivi post-consultation
+      </a>
+    </nav>
+  </header>
+  <div class="tc-outlet">
+    <router-outlet></router-outlet>
   </div>
-</app-dashboard-shell>
+</section>

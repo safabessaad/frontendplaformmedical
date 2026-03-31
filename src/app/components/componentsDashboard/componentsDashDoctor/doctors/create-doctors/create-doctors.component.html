@@ -1,163 +1,91 @@
-<div class="doctor-overview dashboard-wrapper">
-  <div class="main-column">
-    <section class="card welcome-row">
+<section class="doctor-crud-layout">
+  <article class="card main-card">
+    <header class="head-row">
       <div>
-        <h4>Bonjour Docteur</h4>
-        <p>Vue globale du cabinet medical pour aujourd'hui.</p>
+        <h2>Doctors</h2>
+        <p>CRUD medecins organisee avec fiche detaillee.</p>
       </div>
-      <div class="actions">
-        <span class="date-chip">31 Mar, 2026</span>
-        <button class="btn success" (click)="navigateRendezVous()">+ Nouvelle consultation</button>
-        <button class="btn info" (click)="navigateAddAppointment()">Urgences</button>
+      <button class="btn btn-primary" type="button" (click)="toggleForm()">
+        {{ showForm ? 'Fermer le formulaire' : 'Nouveau medecin' }}
+      </button>
+    </header>
+
+    <div class="stats-row">
+      <div class="stat"><strong>{{ totalCount }}</strong><span>Total doctors</span></div>
+      <div class="stat"><strong>{{ activeCount }}</strong><span>Active</span></div>
+      <div class="stat"><strong>{{ onLeaveCount }}</strong><span>On leave</span></div>
+    </div>
+
+    <div class="toolbar">
+      <input type="search" [(ngModel)]="searchTerm" [ngModelOptions]="{ standalone: true }" placeholder="Search doctor by name, id, specialty..." />
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Specialty</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let doctor of filteredDoctors" [class.active]="selectedDoctor?.id === doctor.id" (click)="selectDoctor(doctor)">
+            <td>{{ doctor.id }}</td>
+            <td>{{ doctor.firstName }} {{ doctor.lastName }}</td>
+            <td>{{ doctor.specialty }}</td>
+            <td>{{ doctor.email }}</td>
+            <td>{{ doctor.phone }}</td>
+            <td><span class="status" [class]="statusClass(doctor.status)">{{ doctor.status }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="card side-card">
+    <section *ngIf="selectedDoctor" class="detail-box">
+      <div class="detail-head">
+        <h3>Doctor details</h3>
+        <div class="detail-actions">
+          <button class="btn btn-light" type="button" (click)="editSelectedDoctor()">Edit</button>
+          <button class="btn btn-danger" type="button" (click)="deleteSelectedDoctor()">Delete</button>
+        </div>
       </div>
+      <p><strong>ID:</strong> {{ selectedDoctor.id }}</p>
+      <p><strong>Name:</strong> {{ selectedDoctor.firstName }} {{ selectedDoctor.lastName }}</p>
+      <p><strong>Specialty:</strong> {{ selectedDoctor.specialty }}</p>
+      <p><strong>Email:</strong> {{ selectedDoctor.email }}</p>
+      <p><strong>Phone:</strong> {{ selectedDoctor.phone }}</p>
+      <p><strong>Experience:</strong> {{ selectedDoctor.yearsExperience }} years</p>
+      <p><strong>Availability:</strong> {{ selectedDoctor.availability }}</p>
+      <p><strong>Status:</strong> {{ selectedDoctor.status }}</p>
     </section>
 
-    <section class="stats-grid">
-      @for (card of statCards; track card.navKey) {
-        <article class="card stat-card doctor-stat-card--clickable" (click)="navigateStat(card.navKey)">
-          <div class="stat-top">
-            <span>{{ card.title }}</span>
-            <strong class="up">{{ card.trend }}</strong>
-          </div>
-          <h3>{{ card.value }}</h3>
-          <a href="javascript:void(0);">{{ card.trendLabel }}</a>
-        </article>
-      }
-    </section>
-
-    <section class="two-col">
-      <article class="card revenue-card">
-        <header class="head">
-          <h4>Performance du cabinet</h4>
-          <div class="periods">
-            @for (period of periods; track period) {
-              <button [class.active]="selectedPeriod === period" (click)="setPeriod(period)">{{ period }}</button>
-            }
-          </div>
-        </header>
-
-        <div class="summary-strip">
-          <div>
-            <h5>{{ currentMetrics.consultations }}</h5>
-            <p>Consultations</p>
-          </div>
-          <div>
-            <h5>{{ currentMetrics.revenus }}</h5>
-            <p>Revenus</p>
-          </div>
-          <div>
-            <h5>{{ currentMetrics.dossiers }}</h5>
-            <p>Dossiers traites</p>
-          </div>
-          <div>
-            <h5 class="green">{{ currentMetrics.noShow }}</h5>
-            <p>Taux no-show</p>
-          </div>
-        </div>
-
-        <div class="table-wrap">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Heure</th>
-                <th>Patient</th>
-                <th>Type</th>
-                <th>Etat</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of agendaItems; track item.id) {
-                <tr (click)="onAgendaRowClick(item)" class="agenda-row">
-                  <td>{{ item.time }}</td>
-                  <td>
-                    <button type="button" class="patient-link" (click)="onAgendaPatientNameClick($event, item)">
-                      {{ item.patientName }}
-                    </button>
-                  </td>
-                  <td>{{ item.type }}</td>
-                  <td>
-                    <span
-                      class="badge"
-                      [ngClass]="{
-                        'doctor-badge--confirmed': item.status === 'Confirmed',
-                        'doctor-badge--pending': item.status === 'Pending',
-                        'doctor-badge--cancelled': item.status === 'Cancelled'
-                      }"
-                    >
-                      {{ item.status }}
-                    </span>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </article>
-
-      <article class="card locations-card">
-        <header class="head">
-          <h4>AI Consultation</h4>
-          <button class="btn light" (click)="navigateAiAssistance()">Open</button>
-        </header>
-        <p class="text-muted mb-3">Assist your consultation with live suggestions and summaries.</p>
-        <div class="d-grid gap-2">
-          <button type="button" class="btn success doctor-touch-target" (click)="navigateAiAssistance()">
-            <i class="ri-mic-line me-1"></i> Start Recording
-          </button>
-          <button type="button" class="btn light doctor-touch-target" (click)="navigateAiAssistance()">
-            <i class="ri-robot-line me-1"></i> View AI Assistant
-          </button>
-        </div>
-      </article>
-    </section>
-  </div>
-
-  <aside class="right-column">
-    <section class="card">
-      <h6>Activite recente</h6>
-      <ul class="activity-list">
-        @for (activity of activities; track activity.title) {
-          <li>
-            <div class="dot"></div>
-            <div>
-              <p>{{ activity.title }}</p>
-              <small>{{ activity.time }}</small>
-            </div>
-          </li>
-        }
-      </ul>
-    </section>
-
-    <section class="card">
-      <h6>Top specialites</h6>
-      <ol class="category-list">
-        @for (category of categories; track category.name) {
-          <li>{{ category.name }} <span>{{ category.count }}</span></li>
-        }
-      </ol>
-    </section>
-
-    <section class="card">
-      <h6>Recent patients</h6>
-      <div class="review-item" *ngFor="let p of recentPatients" (click)="onRecentPatientClick(p)">
-        <p>{{ p.name }}</p>
-        <small>{{ p.condition }}</small>
+    <form *ngIf="showForm" [formGroup]="doctorForm" (ngSubmit)="saveDoctor()" class="form-box">
+      <h3>{{ editingId ? 'Edit doctor' : 'New doctor' }}</h3>
+      <div class="row2">
+        <input type="text" formControlName="firstName" placeholder="First name" />
+        <input type="text" formControlName="lastName" placeholder="Last name" />
       </div>
-    </section>
-
-    <section class="card">
-      <h6>Satisfaction patients</h6>
-      <div class="rating-box">
-        <strong>4.9 / 5</strong>
-        <p>Total 5.50k retours</p>
+      <input type="email" formControlName="email" placeholder="Email" />
+      <input type="text" formControlName="phone" placeholder="Phone" />
+      <input type="text" formControlName="specialty" placeholder="Specialty" />
+      <div class="row2">
+        <input type="number" formControlName="yearsExperience" placeholder="Years experience" />
+        <select formControlName="status">
+          <option value="Active">Active</option>
+          <option value="On leave">On leave</option>
+          <option value="Inactive">Inactive</option>
+        </select>
       </div>
-      @for (row of reviewStats; track row.star) {
-        <div class="star-row">
-          <span>{{ row.star }} star</span>
-          <div class="bar"><i [style.width.%]="row.percent"></i></div>
-          <span>{{ row.count }}</span>
-        </div>
-      }
-    </section>
-  </aside>
-</div>
+      <input type="text" formControlName="availability" placeholder="Availability" />
+      <button class="btn btn-primary" type="submit" [disabled]="doctorForm.invalid">
+        {{ editingId ? 'Update' : 'Save' }}
+      </button>
+    </form>
+  </article>
+</section>

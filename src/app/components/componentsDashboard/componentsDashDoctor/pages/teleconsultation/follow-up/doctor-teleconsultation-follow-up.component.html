@@ -1,0 +1,60 @@
+<section class="tc-follow">
+  <div class="tc-follow__toolbar card">
+    <div>
+      <h2 class="tc-follow__title">Suivi post-consultation</h2>
+      <p class="tc-follow__subtitle">Relances, plans de soins et prochaines étapes après les sessions vidéo.</p>
+    </div>
+  </div>
+
+  <div class="tc-follow__kpis">
+    <div class="tc-follow__kpi">
+      <span class="tc-follow__kpi-label">En cours</span>
+      <strong class="tc-follow__kpi-value">{{ kpiInProgress }}</strong>
+    </div>
+    <div class="tc-follow__kpi">
+      <span class="tc-follow__kpi-label">En attente</span>
+      <strong class="tc-follow__kpi-value">{{ kpiPending }}</strong>
+    </div>
+    <div class="tc-follow__kpi">
+      <span class="tc-follow__kpi-label">Terminés</span>
+      <strong class="tc-follow__kpi-value">{{ kpiCompleted }}</strong>
+    </div>
+  </div>
+
+  <div class="card tc-follow__table-card">
+    <div class="tc-follow__table-head">
+      <span class="tc-follow__table-hint">Plans de suivi</span>
+    </div>
+    <div class="table-responsive tc-follow__wrap">
+      <table class="table table-hover align-middle mb-0 tc-follow__table">
+        <thead>
+          <tr>
+            <th scope="col">Patient</th>
+            <th scope="col">Réf. suivi</th>
+            <th scope="col">Session liée</th>
+            <th scope="col">Prochaine date</th>
+            <th scope="col">Plan</th>
+            <th scope="col">État</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of followUps">
+            <td>
+              <div class="tc-follow__patient">
+                <span class="tc-follow__avatar" [attr.aria-label]="item.patient">{{ initials(item.patient) }}</span>
+                <span class="tc-follow__name">{{ item.patient }}</span>
+              </div>
+            </td>
+            <td><code class="tc-follow__code">{{ item.id }}</code></td>
+            <td><code class="tc-follow__code">{{ item.sessionId }}</code></td>
+            <td>{{ item.nextDate | date : 'dd/MM/yyyy' }}</td>
+            <td><span class="tc-follow__plan">{{ item.treatmentPlan }}</span></td>
+            <td>
+              <span class="tc-fu-badge" [ngClass]="followUpStatusClass(item.status)">{{ followUpLabel(item.status) }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

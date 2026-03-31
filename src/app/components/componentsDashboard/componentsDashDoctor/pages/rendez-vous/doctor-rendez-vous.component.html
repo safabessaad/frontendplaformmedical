@@ -1,47 +1,106 @@
-<app-dashboard-shell
-  [title]="'Appointments'"
-  [subtitle]="'Validate, cancel or monitor today appointment flow.'"
-  [metrics]="[
-    { label: 'Today', value: '24' },
-    { label: 'Confirmed', value: '16' },
-    { label: 'Pending', value: '6' }
-  ]"
-  [secondaryMetrics]="[
-    { label: 'Completion rate', value: '88%' },
-    { label: 'Avg wait time', value: '11m' },
-    { label: 'Teleconsult slots', value: '3' },
-    { label: 'No-show', value: '2' }
-  ]"
->
-  <div class="card border-0 shadow-sm">
-    <div class="card-body table-responsive">
-      <table class="table align-middle mb-0">
+<section class="appointments-layout">
+  <article class="card main-card">
+    <header class="head-row">
+      <div>
+        <h2>Rendez-vous</h2>
+        <p>Planning medecin, suivi des etats et gestion des consultations.</p>
+      </div>
+      <button type="button" class="btn btn-primary" (click)="toggleForm()">
+        {{ showForm ? 'Fermer le formulaire' : 'Ajouter un rendez-vous' }}
+      </button>
+    </header>
+
+    <div class="toolbar">
+      <div class="chips">
+        <button
+          type="button"
+          *ngFor="let status of statuses"
+          class="chip"
+          [class.active]="selectedStatus === status"
+          (click)="selectedStatus = status"
+        >
+          {{ status }}
+        </button>
+      </div>
+      <input type="search" [(ngModel)]="searchTerm" [ngModelOptions]="{ standalone: true }" placeholder="Rechercher patient..." />
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><strong>{{ todayCount }}</strong><span>Aujourd'hui</span></div>
+      <div class="stat"><strong>{{ confirmedCount }}</strong><span>Confirmes</span></div>
+      <div class="stat"><strong>{{ pendingCount }}</strong><span>En attente</span></div>
+      <div class="stat"><strong>{{ cancelledCount }}</strong><span>Annules</span></div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Patient</th>
-            <th>Type</th>
-            <th>Time</th>
-            <th>Status</th>
-            <th class="text-end">Actions</th>
+            <th>Heure</th><th>Date</th><th>Patient</th><th>Type</th><th>Salle</th><th>Etat</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of appointments">
-            <td>{{ item.id }}</td>
-            <td>{{ item.patient }}</td>
-            <td>{{ item.type }}</td>
-            <td>{{ item.time }}</td>
-            <td>
-              <app-status-badge [status]="item.status"></app-status-badge>
+          <tr *ngFor="let appointment of filteredAppointments" (click)="selectAppointment(appointment)">
+            <td>{{ appointment.time }}</td>
+            <td>{{ appointment.date }}</td>
+            <td>{{ appointment.patient }}</td>
+            <td>{{ appointment.type }}</td>
+            <td>{{ appointment.room }}</td>
+            <td><span class="status" [class]="statusClass(appointment.status)">{{ appointment.status }}</span></td>
+            <td class="actions-cell">
+              <button type="button" class="btn-action" (click)="setStatus(appointment, 'Confirme'); $event.stopPropagation()">Confirmer</button>
+              <button type="button" class="btn-action warn" (click)="setStatus(appointment, 'Reporte'); $event.stopPropagation()">Reporter</button>
+              <button type="button" class="btn-action danger" (click)="setStatus(appointment, 'Annule'); $event.stopPropagation()">Annuler</button>
             </td>
-            <td class="text-end">
-              <button class="btn btn-sm btn-soft-success me-1" (click)="setStatus(item.id, 'Confirmed')">Confirm</button>
-              <button class="btn btn-sm btn-soft-danger" (click)="setStatus(item.id, 'Cancelled')">Cancel</button>
-            </td>
+          </tr>
+          <tr *ngIf="filteredAppointments.length === 0">
+            <td colspan="7" class="empty">Aucun rendez-vous pour ce filtre.</td>
           </tr>
         </tbody>
       </table>
     </div>
-  </div>
-</app-dashboard-shell>
+  </article>
+
+  <article class="card side-card">
+    <section *ngIf="selectedAppointment" class="detail">
+      <h3>Details rendez-vous</h3>
+      <p><strong>Patient:</strong> {{ selectedAppointment.patient }}</p>
+      <p><strong>Date:</strong> {{ selectedAppointment.date }} a {{ selectedAppointment.time }}</p>
+      <p><strong>Type:</strong> {{ selectedAppointment.type }}</p>
+      <p><strong>Salle:</strong> {{ selectedAppointment.room }}</p>
+      <p><strong>Etat:</strong> {{ selectedAppointment.status }}</p>
+      <p><strong>Notes:</strong> {{ selectedAppointment.notes || 'Aucune note' }}</p>
+    </section>
+
+    <form *ngIf="showForm" [formGroup]="appointmentForm" (ngSubmit)="saveAppointment()" class="form">
+      <h3>{{ editingId ? 'Modifier rendez-vous' : 'Nouveau rendez-vous' }}</h3>
+      <input type="text" formControlName="patient" placeholder="Nom patient" />
+      <div class="row2">
+        <input type="date" formControlName="date" />
+        <input type="time" formControlName="time" />
+      </div>
+      <div class="row2">
+        <select formControlName="type">
+          <option value="Consultation generale">Consultation generale</option>
+          <option value="Suivi">Suivi</option>
+          <option value="Urgence">Urgence</option>
+          <option value="Teleconsultation">Teleconsultation</option>
+        </select>
+        <input type="text" formControlName="room" placeholder="Cabinet 1 / Visio" />
+      </div>
+      <select formControlName="status">
+        <option value="Confirme">Confirme</option>
+        <option value="En attente">En attente</option>
+        <option value="Reporte">Reporte</option>
+        <option value="Annule">Annule</option>
+      </select>
+      <textarea rows="3" formControlName="notes" placeholder="Notes medicales..."></textarea>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="appointmentForm.invalid">
+          {{ editingId ? 'Mettre a jour' : 'Ajouter' }}
+        </button>
+        <button type="button" class="btn btn-light" (click)="resetForm()">Vider</button>
+      </div>
+    </form>
+  </article>
+</section>

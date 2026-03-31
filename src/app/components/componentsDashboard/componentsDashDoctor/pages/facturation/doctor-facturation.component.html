@@ -1,31 +1,127 @@
-<app-dashboard-shell
-  [title]="'Billing'"
-  [subtitle]="'Track invoices, payment status and cashflow.'"
-  [metrics]="[
-    { label: 'Month revenue', value: '$48,920' },
-    { label: 'Pending', value: '$3,120' },
-    { label: 'Paid invoices', value: '42' }
-  ]"
-  [secondaryMetrics]="[
-    { label: 'Average invoice', value: '$108' },
-    { label: 'Overdue invoices', value: '3' },
-    { label: 'Collection rate', value: '91%' },
-    { label: 'Refunds', value: '$420' }
-  ]"
->
-  <div class="card border-0 shadow-sm">
-    <div class="card-body table-responsive">
-      <table class="table align-middle mb-0">
-        <thead><tr><th>Invoice</th><th>Patient</th><th>Amount</th><th>Status</th></tr></thead>
+<section class="billing-layout">
+  <article class="card main-card">
+    <header class="head-row">
+      <div>
+        <h2>Facturation</h2>
+        <p>Gestion des actes, factures, paiements et recus patients.</p>
+      </div>
+      <button type="button" class="btn btn-primary" (click)="toggleInvoiceForm()">
+        {{ showInvoiceForm ? 'Fermer' : 'Nouvelle facture' }}
+      </button>
+    </header>
+
+    <div class="kpis">
+      <div class="kpi"><strong>{{ totalInvoiced | number:'1.0-0' }} Dinar</strong><span>Total facture</span></div>
+      <div class="kpi"><strong>{{ totalReceived | number:'1.0-0' }} Dinar</strong><span>Total recu</span></div>
+      <div class="kpi"><strong>{{ totalOutstanding | number:'1.0-0' }} Dinar</strong><span>Impayes</span></div>
+      <div class="kpi"><strong>{{ pendingCount }}</strong><span>Factures en attente</span></div>
+    </div>
+
+    <div class="toolbar">
+      <input type="search" [(ngModel)]="searchTerm" [ngModelOptions]="{ standalone: true }" placeholder="Rechercher patient / facture" />
+      <select [(ngModel)]="statusFilter" [ngModelOptions]="{ standalone: true }">
+        <option value="All">Tous statuts</option>
+        <option value="Paid">Paid</option>
+        <option value="Pending">Pending</option>
+        <option value="Partial">Partial</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr><th>Facture</th><th>Patient</th><th>Acte</th><th>Montant</th><th>Paye</th><th>Echeance</th><th>Etat</th></tr>
+        </thead>
         <tbody>
-          <tr *ngFor="let i of invoices">
-            <td>{{ i.no }}</td>
-            <td>{{ i.patient }}</td>
-            <td>${{ i.amount }}</td>
-            <td><app-status-badge [status]="i.status"></app-status-badge></td>
+          <tr *ngFor="let invoice of filteredInvoices" [class.active]="selectedInvoice?.id === invoice.id" (click)="selectInvoice(invoice)">
+            <td>{{ invoice.id }}</td>
+            <td>{{ invoice.patient }}</td>
+            <td>{{ invoice.act }}</td>
+            <td>{{ invoice.amount | number:'1.0-0' }} Dinar</td>
+            <td>{{ invoice.paidAmount | number:'1.0-0' }} Dinar</td>
+            <td>{{ invoice.dueDate }}</td>
+            <td><span class="status" [class]="statusClass(invoice.status)">{{ invoice.status }}</span></td>
           </tr>
+          <tr *ngIf="filteredInvoices.length === 0"><td colspan="7" class="empty">Aucune facture trouvee.</td></tr>
         </tbody>
       </table>
     </div>
-  </div>
-</app-dashboard-shell>
+  </article>
+
+  <article class="side-card">
+    <section class="card invoice-drawer" *ngIf="selectedInvoice">
+      <div class="drawer-head">
+        <h3>Bill ID {{ selectedInvoice.id }}</h3>
+        <button class="btn btn-light" type="button" (click)="exportReceipt()">History & comment</button>
+      </div>
+
+      <label class="field-label">Select Account</label>
+      <select [(ngModel)]="selectedAccount" [ngModelOptions]="{ standalone: true }">
+        <option>Treatment fund</option>
+        <option>General fund</option>
+      </select>
+
+      <div class="bill-meta">
+        <div>
+          <small>BILL TO</small>
+          <p>{{ selectedInvoice.patient }}</p>
+        </div>
+        <div>
+          <small>BILL DATE</small>
+          <p>{{ selectedInvoice.dueDate }}</p>
+        </div>
+      </div>
+
+      <div class="line-items">
+        <div><span>{{ selectedInvoice.act }}</span><strong>{{ selectedInvoice.amount | number:'1.0-0' }} Dinar</strong></div>
+        <div><span>Paid</span><strong>{{ selectedInvoice.paidAmount | number:'1.0-0' }} Dinar</strong></div>
+        <div><span>Remaining</span><strong>{{ remainingAmount(selectedInvoice) | number:'1.0-0' }} Dinar</strong></div>
+      </div>
+
+      <label class="field-label">Add Note (optional)</label>
+      <textarea rows="2" [(ngModel)]="addNote" [ngModelOptions]="{ standalone: true }" placeholder="Type a message..."></textarea>
+    </section>
+
+    <section class="card cash-card" *ngIf="selectedInvoice">
+      <h3>Cash</h3>
+      <div class="total-row">
+        <span>Total Payment</span>
+        <strong>{{ remainingAmount(selectedInvoice) | number:'1.0-0' }} Dinar</strong>
+      </div>
+      <form [formGroup]="paymentForm" (ngSubmit)="recordPayment()" class="form">
+        <label class="field-label">Input amount</label>
+        <input type="number" formControlName="amount" placeholder="0" />
+        <div class="quick-amounts">
+          <button type="button" class="btn btn-light" *ngFor="let amount of quickAmounts" (click)="pickQuickAmount(amount)">
+            $ {{ amount }}.00
+          </button>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" [disabled]="paymentForm.invalid">Pay</button>
+      </form>
+
+      <div class="payment-methods">
+        <p class="field-label">Select a payment method</p>
+        <button type="button" class="method" [class.active]="selectedPaymentMethod === 'Cash'" (click)="selectPaymentMethod('Cash')">Cash</button>
+        <button type="button" class="method" [class.active]="selectedPaymentMethod === 'Credit card'" (click)="selectPaymentMethod('Credit card')">Credit card</button>
+      </div>
+      <p *ngIf="receiptMessage" class="msg">{{ receiptMessage }}</p>
+    </section>
+
+    <section *ngIf="showInvoiceForm" class="card box">
+      <h3>Ajouter facture</h3>
+      <form [formGroup]="invoiceForm" (ngSubmit)="createInvoice()" class="form">
+        <input type="text" formControlName="patient" placeholder="Nom patient" />
+        <input type="text" formControlName="act" placeholder="Acte medical" />
+        <div class="row2">
+          <input type="number" formControlName="amount" placeholder="Montant" />
+          <input type="date" formControlName="dueDate" />
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="invoiceForm.invalid">Enregistrer</button>
+      </form>
+    </section>
+    <section *ngIf="!selectedInvoice && !showInvoiceForm" class="card box">
+      <p>Selectionne une facture pour afficher les details et le paiement.</p>
+    </section>
+  </article>
+</section>

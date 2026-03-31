@@ -1,32 +1,17 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { FormBuilder, Validators } from '@angular/forms';
 
-export type AgendaStatus = 'Confirmed' | 'Pending' | 'Cancelled';
-
-export type StatNavKey = 'appointments' | 'patients' | 'revenue' | 'satisfaction';
-
-export interface AgendaItem {
+type DoctorStatus = 'Active' | 'On leave' | 'Inactive';
+interface DoctorItem {
   id: string;
-  patientId: string;
-  time: string;
-  patientName: string;
-  type: string;
-  status: AgendaStatus;
-}
-
-export interface RecentPatient {
-  id: string;
-  initials: string;
-  name: string;
-  condition: string;
-  avatarClass: string;
-}
-
-interface PerformanceMetric {
-  consultations: string;
-  revenus: string;
-  dossiers: string;
-  noShow: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  specialty: string;
+  yearsExperience: number;
+  availability: string;
+  status: DoctorStatus;
 }
 
 @Component({
@@ -36,225 +21,159 @@ interface PerformanceMetric {
   styleUrl: './create-doctors.component.scss',
 })
 export class CreateDoctorsComponent {
-  constructor(private router: Router) {}
+  protected searchTerm = '';
+  protected showForm = false;
+  protected editingId: string | null = null;
 
-  readonly statCards: Array<{
-    navKey: StatNavKey;
-    title: string;
-    value: string;
-    trend: string;
-    trendLabel: string;
-    icon: string;
-    iconWrapClass: string;
-    iconColorClass: string;
-  }> = [
+  protected readonly doctorForm = this.fb.group({
+    firstName: ['', [Validators.required]],
+    lastName: ['', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]],
+    phone: ['', [Validators.required]],
+    specialty: ['', [Validators.required]],
+    yearsExperience: [3, [Validators.required, Validators.min(0)]],
+    availability: ['Mon-Fri 09:00-17:00', [Validators.required]],
+    status: ['Active' as DoctorStatus, [Validators.required]]
+  });
+
+  protected doctors: DoctorItem[] = [
     {
-      navKey: 'appointments',
-      title: "Today's Appointments",
-      value: '24',
-      trend: '+12%',
-      trendLabel: 'vs last week',
-      icon: 'ri-calendar-check-line',
-      iconWrapClass: 'doctor-stat-icon-wrap--blue',
-      iconColorClass: 'doctor-stat-icon--blue',
+      id: 'DOC-001',
+      firstName: 'Sami',
+      lastName: 'Khiari',
+      email: 'sami.khiari@clinic.com',
+      phone: '+216 55 221 144',
+      specialty: 'General medicine',
+      yearsExperience: 10,
+      availability: 'Mon-Fri 09:00-17:00',
+      status: 'Active'
     },
     {
-      navKey: 'patients',
-      title: 'Total Patients',
-      value: '1,248',
-      trend: '+5%',
-      trendLabel: 'vs last week',
-      icon: 'ri-team-line',
-      iconWrapClass: 'doctor-stat-icon-wrap--teal',
-      iconColorClass: 'doctor-stat-icon--teal',
-    },
-    {
-      navKey: 'revenue',
-      title: 'Revenue',
-      value: '$48,920',
-      trend: '+8%',
-      trendLabel: 'vs last month',
-      icon: 'ri-money-dollar-circle-line',
-      iconWrapClass: 'doctor-stat-icon-wrap--amber',
-      iconColorClass: 'doctor-stat-icon--amber',
-    },
-    {
-      navKey: 'satisfaction',
-      title: 'Satisfaction',
-      value: '4.9/5',
-      trend: '+0.2',
-      trendLabel: 'vs last month',
-      icon: 'ri-emotion-happy-line',
-      iconWrapClass: 'doctor-stat-icon-wrap--violet',
-      iconColorClass: 'doctor-stat-icon--violet',
-    },
+      id: 'DOC-002',
+      firstName: 'Nour',
+      lastName: 'Ben Ali',
+      email: 'nour.benali@clinic.com',
+      phone: '+216 58 110 778',
+      specialty: 'Cardiology',
+      yearsExperience: 7,
+      availability: 'Mon-Thu 08:30-15:30',
+      status: 'On leave'
+    }
   ];
+  protected selectedDoctor: DoctorItem | null = this.doctors[0] ?? null;
 
-  readonly agendaItems: AgendaItem[] = [
-    {
-      id: 'apt-1',
-      patientId: 'pat-1',
-      time: '09:00 AM',
-      patientName: 'John Smith',
-      type: 'Follow-up',
-      status: 'Confirmed',
-    },
-    {
-      id: 'apt-2',
-      patientId: 'pat-2',
-      time: '10:30 AM',
-      patientName: 'Maria Garcia',
-      type: 'Consultation',
-      status: 'Pending',
-    },
-    {
-      id: 'apt-3',
-      patientId: 'pat-3',
-      time: '02:00 PM',
-      patientName: 'David Chen',
-      type: 'Check-up',
-      status: 'Cancelled',
-    },
-    {
-      id: 'apt-4',
-      patientId: 'pat-4',
-      time: '03:30 PM',
-      patientName: 'Emma Wilson',
-      type: 'Follow-up',
-      status: 'Confirmed',
-    },
-    {
-      id: 'apt-5',
-      patientId: 'pat-5',
-      time: '04:45 PM',
-      patientName: 'James Brown',
-      type: 'Consultation',
-      status: 'Pending',
-    },
-  ];
+  constructor(private readonly fb: FormBuilder) {}
 
-  readonly recentPatients: RecentPatient[] = [
-    {
-      id: 'rp-1',
-      initials: 'JD',
-      name: 'John Doe',
-      condition: 'Hypertension',
-      avatarClass: 'doctor-avatar--blue',
-    },
-    {
-      id: 'rp-2',
-      initials: 'SK',
-      name: 'Sarah Kim',
-      condition: 'Type 2 Diabetes',
-      avatarClass: 'doctor-avatar--teal',
-    },
-    {
-      id: 'rp-3',
-      initials: 'MR',
-      name: 'Mike Ross',
-      condition: 'Annual physical',
-      avatarClass: 'doctor-avatar--amber',
-    },
-    {
-      id: 'rp-4',
-      initials: 'LW',
-      name: 'Lisa Wong',
-      condition: 'Post-op follow-up',
-      avatarClass: 'doctor-avatar--rose',
-    },
-  ];
-
-  readonly activities = [
-    { title: 'Consultation completed: John Smith', time: '10:14 Today' },
-    { title: 'Medical file updated: Sarah Kim', time: '09:47 Today' },
-    { title: 'Invoice payment received #INV-2026-002', time: 'Yesterday 18:20' },
-    { title: 'Reminder sent: Emma Wilson', time: 'Yesterday 16:05' },
-  ];
-
-  readonly categories = [
-    { name: 'General medicine', count: '(1,294)' },
-    { name: 'Cardiology', count: '(826)' },
-    { name: 'Pediatrics', count: '(479)' },
-    { name: 'Dermatology', count: '(275)' },
-    { name: 'Neurology', count: '(150)' },
-  ];
-
-  readonly reviewStats = [
-    { star: 5, percent: 50, count: 2758 },
-    { star: 4, percent: 29, count: 1063 },
-    { star: 3, percent: 18, count: 997 },
-    { star: 2, percent: 5, count: 227 },
-    { star: 1, percent: 8, count: 408 },
-  ];
-
-  selectedPeriod: 'ALL' | '1M' | '6M' | '1Y' = '1Y';
-  readonly periods: Array<'ALL' | '1M' | '6M' | '1Y'> = ['ALL', '1M', '6M', '1Y'];
-  readonly summaryByPeriod: Record<'ALL' | '1M' | '6M' | '1Y', PerformanceMetric> = {
-    ALL: { consultations: '3,251', revenus: '$10.45k', dossiers: '152', noShow: '14.12%' },
-    '1M': { consultations: '265', revenus: '$1.82k', dossiers: '34', noShow: '10.08%' },
-    '6M': { consultations: '1,986', revenus: '$8.11k', dossiers: '111', noShow: '13.74%' },
-    '1Y': { consultations: '7,585', revenus: '$22.89k', dossiers: '367', noShow: '18.92%' },
-  };
-
-  setPeriod(period: 'ALL' | '1M' | '6M' | '1Y'): void {
-    this.selectedPeriod = period;
+  protected get filteredDoctors(): DoctorItem[] {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) {
+      return this.doctors;
+    }
+    return this.doctors.filter((doctor) =>
+      `${doctor.id} ${doctor.firstName} ${doctor.lastName} ${doctor.specialty}`.toLowerCase().includes(term)
+    );
   }
 
-  get currentMetrics(): PerformanceMetric {
-    return this.summaryByPeriod[this.selectedPeriod];
+  protected get activeCount(): number {
+    return this.doctors.filter((doctor) => doctor.status === 'Active').length;
   }
 
-  /** Doctor area: `/doctor/rendez-vous` */
-  navigateStat(key: StatNavKey): void {
-    switch (key) {
-      case 'appointments':
-        this.router.navigate(['/doctor', 'rendez-vous']);
-        break;
-      case 'patients':
-        this.router.navigate(['/doctor', 'patients']);
-        break;
-      case 'revenue':
-        this.router.navigate(['/doctor', 'facturation']);
-        break;
-      case 'satisfaction':
-        this.router.navigate(['/doctor', 'reclamations', 'view', '1']);
-        break;
+  protected get onLeaveCount(): number {
+    return this.doctors.filter((doctor) => doctor.status === 'On leave').length;
+  }
+
+  protected get totalCount(): number {
+    return this.doctors.length;
+  }
+
+  protected selectDoctor(doctor: DoctorItem): void {
+    this.selectedDoctor = doctor;
+  }
+
+  protected toggleForm(): void {
+    this.showForm = !this.showForm;
+    if (!this.showForm) {
+      this.resetForm();
     }
   }
 
-  /** No `/doctor/.../appointments/:id` route in project — intentional no-op */
-  onAgendaRowClick(_item: AgendaItem): void {}
+  protected saveDoctor(): void {
+    if (this.doctorForm.invalid) {
+      return;
+    }
+    const value = this.doctorForm.getRawValue();
+    const payload = {
+      firstName: value.firstName ?? '',
+      lastName: value.lastName ?? '',
+      email: value.email ?? '',
+      phone: value.phone ?? '',
+      specialty: value.specialty ?? '',
+      yearsExperience: Number(value.yearsExperience ?? 0),
+      availability: value.availability ?? '',
+      status: (value.status ?? 'Active') as DoctorStatus
+    };
 
-  /** No `/doctor/patients/:id` route — intentional no-op */
-  onAgendaPatientNameClick(event: Event, _item: AgendaItem): void {
-    event.stopPropagation();
+    if (this.editingId) {
+      this.doctors = this.doctors.map((doctor) => doctor.id === this.editingId ? { ...doctor, ...payload } : doctor);
+      this.selectedDoctor = this.doctors.find((doctor) => doctor.id === this.editingId) ?? null;
+    } else {
+      const created: DoctorItem = { id: `DOC-${Date.now().toString().slice(-4)}`, ...payload };
+      this.doctors = [created, ...this.doctors];
+      this.selectedDoctor = created;
+    }
+
+    this.showForm = false;
+    this.resetForm();
   }
 
-  navigateWeekView(): void {
-    this.router.navigate(['/doctor', 'agenda']);
+  protected editSelectedDoctor(): void {
+    if (!this.selectedDoctor) {
+      return;
+    }
+    this.editingId = this.selectedDoctor.id;
+    this.showForm = true;
+    this.doctorForm.patchValue({
+      firstName: this.selectedDoctor.firstName,
+      lastName: this.selectedDoctor.lastName,
+      email: this.selectedDoctor.email,
+      phone: this.selectedDoctor.phone,
+      specialty: this.selectedDoctor.specialty,
+      yearsExperience: this.selectedDoctor.yearsExperience,
+      availability: this.selectedDoctor.availability,
+      status: this.selectedDoctor.status
+    });
   }
 
-  navigateAddAppointment(): void {
-    this.router.navigate(['/doctor', 'agenda']);
+  protected deleteSelectedDoctor(): void {
+    if (!this.selectedDoctor) {
+      return;
+    }
+    const id = this.selectedDoctor.id;
+    this.doctors = this.doctors.filter((doctor) => doctor.id !== id);
+    this.selectedDoctor = this.doctors[0] ?? null;
+    if (this.editingId === id) {
+      this.showForm = false;
+      this.resetForm();
+    }
   }
 
-  navigateAiAssistance(): void {
-    this.router.navigate(['/doctor', 'ia-assistance']);
+  protected statusClass(status: DoctorStatus): 'active' | 'leave' | 'inactive' {
+    if (status === 'Active') return 'active';
+    if (status === 'On leave') return 'leave';
+    return 'inactive';
   }
 
-  /** No `/doctor/patients/:id` — intentional no-op */
-  onRecentPatientClick(_p: RecentPatient): void {}
-
-  navigateTeleconsultation(): void {
-    this.router.navigate(['/doctor', 'teleconsultation']);
-  }
-
-  navigateRendezVous(): void {
-    this.router.navigate(['/doctor', 'rendez-vous']);
-  }
-
-  /** No dedicated "more" route */
-  onAgendaMoreClick(event: Event): void {
-    event.stopPropagation();
+  private resetForm(): void {
+    this.editingId = null;
+    this.doctorForm.reset({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      specialty: '',
+      yearsExperience: 3,
+      availability: 'Mon-Fri 09:00-17:00',
+      status: 'Active'
+    });
   }
 }

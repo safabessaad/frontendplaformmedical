@@ -1,0 +1,35 @@
+<section class="whatsapp-grid">
+  <aside class="threads card">
+    <div class="channel-head">
+      <div><h3>WhatsApp cabinet</h3><small>Canal direct patients</small></div>
+      <span class="status">Connecte</span>
+    </div>
+    <input [(ngModel)]="searchTerm" type="text" placeholder="Rechercher conversation..." />
+    <div class="thread-list">
+      <button *ngFor="let thread of filteredThreads" type="button" class="thread-item" [class.active]="thread.active">
+        <div>
+          <strong>{{ thread.patient }}</strong>
+          <small>{{ thread.phone }}</small>
+          <p>{{ thread.lastMessage }}</p>
+        </div>
+        <span *ngIf="thread.unread > 0">{{ thread.unread }}</span>
+      </button>
+    </div>
+  </aside>
+
+  <article class="conversation card">
+    <header class="conversation-head">
+      <div><h3>Fatima Rachidi</h3><small>Demande de suivi post consultation</small></div>
+      <button type="button">Envoyer document</button>
+    </header>
+    <div class="messages">
+      <div class="msg" *ngFor="let message of messages" [class.me]="message.author === 'cabinet'">
+        <p>{{ message.text }}</p><small>{{ message.time }}</small>
+      </div>
+    </div>
+    <footer class="composer">
+      <input [(ngModel)]="draft" type="text" placeholder="Ecrire une reponse WhatsApp..." />
+      <button type="button" (click)="send()">Envoyer</button>
+    </footer>
+  </article>
+</section>

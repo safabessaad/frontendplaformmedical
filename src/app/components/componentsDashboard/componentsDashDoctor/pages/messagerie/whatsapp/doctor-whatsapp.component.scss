@@ -1,0 +1,15 @@
+.whatsapp-grid { display: grid; grid-template-columns: 320px 1fr; gap: 0.8rem; min-height: 520px; }
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.8rem; }
+.threads, .conversation { display: grid; gap: 0.7rem; }
+.channel-head, .conversation-head { display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; }
+.status { background: #dcfce7; color: #166534; border-radius: 999px; padding: 0.22rem 0.5rem; font-size: 0.7rem; font-weight: 600; }
+input { width: 100%; border: 1px solid #e2e8f0; border-radius: 0.35rem; background: #f8fafc; height: 38px; padding: 0 0.7rem; font-size: 0.8rem; }
+.thread-list { display: grid; gap: 0.35rem; overflow: auto; }
+.thread-item { border: 1px solid #e2e8f0; background: #fff; border-radius: 0.45rem; padding: 0.55rem 0.65rem; display: flex; justify-content: space-between; gap: 0.6rem; text-align: left; cursor: pointer; }
+.thread-item.active { background: #f0fdf4; border-color: #86efac; }
+.messages { display: grid; gap: 0.5rem; align-content: start; overflow: auto; }
+.msg { max-width: 76%; border: 1px solid #e2e8f0; border-radius: 0.45rem; background: #fff; padding: 0.5rem 0.6rem; }
+.msg.me { margin-left: auto; background: #dcfce7; border-color: #86efac; }
+.composer { display: grid; grid-template-columns: 1fr auto; gap: 0.45rem; border-top: 1px solid #f1f5f9; padding-top: 0.65rem; }
+.composer button, .conversation-head button { border: 0; border-radius: 0.35rem; background: #22c55e; color: #fff; padding: 0.42rem 0.7rem; font-size: 0.78rem; cursor: pointer; }
+@media (max-width: 992px) { .whatsapp-grid { grid-template-columns: 1fr; } }
