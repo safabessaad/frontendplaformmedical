@@ -10,20 +10,31 @@ export class CalendarEventsService {
   ];
 
   list(): CalendarEventModel[] { return [...this.events]; }
+  getById(eventId: string): CalendarEventModel | undefined { return this.events.find((item) => item.id === eventId); }
   add(input: Omit<CalendarEventModel, 'id'>): CalendarEventModel { const event = { id: `evt-${Date.now()}`, ...input }; this.events.push(event); return event; }
   update(eventId: string, payload: Omit<CalendarEventModel, 'id'>): void {
     const index = this.events.findIndex((item) => item.id === eventId);
     if (index >= 0) this.events[index] = { id: eventId, ...payload };
   }
+  remove(eventId: string): void {
+    const index = this.events.findIndex((item) => item.id === eventId);
+    if (index >= 0) this.events.splice(index, 1);
+  }
 
   toCalendarInputs(items: CalendarEventModel[]): EventInput[] {
-    return items.map((item) => ({
-      id: item.id,
-      title: `${item.patientName} - ${item.title}`,
-      start: `${item.date}T${item.startTime}:00`,
-      end: `${item.date}T${item.endTime}:00`,
-      extendedProps: { location: item.location, description: item.description, patientName: item.patientName, category: item.category }
-    }));
+    return items.map((item) => {
+      const style = this.getCategoryStyle(item.category);
+      return {
+        id: item.id,
+        title: `${item.patientName} - ${item.title}`,
+        start: `${item.date}T${item.startTime}:00`,
+        end: `${item.date}T${item.endTime}:00`,
+        backgroundColor: style.background,
+        borderColor: style.border,
+        textColor: style.text,
+        extendedProps: { location: item.location, description: item.description, patientName: item.patientName, category: item.category }
+      };
+    });
   }
 
   getCategoryStyle(category: CalendarEventCategory): { background: string; border: string; text: string } {
