@@ -86,37 +86,7 @@ const routes: Routes = [
         redirectTo: 'reclamations/view/1',
         pathMatch: 'full'
   },
-  // {
-  //     path: '',
-  //     //component: AdduserComponent,
-  //     data: {
-  //         title: 'users'
-  //     }, 
-  //     children: [ 
-  //         {
-  //             path: 'add',
-  //             component: AddUserComponent,
-  //             data: {
-  //                 title: 'Add user'
-  //             }
-  //         },
-  //         {
-  //             path: 'edit/:id',
-  //             component: EdituserComponent,
-  //             data: {
-  //                 title: 'Edit user'
-  //             }
-  //         },
-  //         {
-  //             path: 'view/:id',
-  //             component: ViewusersComponent,
-  //             data: {
-  //                 title: 'View user'
-  //             }
-  //         }
-           
-   ] 
-
+];
 
 @NgModule({
   declarations: [

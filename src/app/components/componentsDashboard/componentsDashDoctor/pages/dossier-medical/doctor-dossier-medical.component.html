@@ -14,7 +14,11 @@
       <div class="kpi"><strong>{{ records.length }}</strong><span>Total dossiers</span></div>
       <div class="kpi"><strong>{{ highRiskCount }}</strong><span>Risque eleve</span></div>
       <div class="kpi"><strong>{{ restrictedCount }}</strong><span>Acces restreint</span></div>
-      <div class="kpi"><strong>{{ totalDocuments }}</strong><span>Documents</span></div>
+      <div class="kpi">
+        <strong>{{ totalDocuments }}</strong>
+        <span>Documents</span>
+        <span class="kpi-hint">Total sur tous les dossiers (voir colonne Docs ou selectionnez un patient)</span>
+      </div>
     </div>
 
     <div class="filters">
@@ -114,6 +118,7 @@
         <input type="checkbox" formControlName="consentChecked" />
         <span>Confidentialite et consentement verifies</span>
       </label>
+      <p *ngIf="recordForm.invalid && formBlockReason" class="form-hint text-danger">{{ formBlockReason }}</p>
       <div class="actions">
         <button type="submit" class="btn btn-primary" [disabled]="recordForm.invalid">{{ editingId ? 'Mettre a jour' : 'Enregistrer' }}</button>
         <button type="button" class="btn btn-light" (click)="resetForm()">Vider</button>

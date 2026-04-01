@@ -85,6 +85,11 @@
   justify-content: center;
 }
 
+.history-list {
+  max-height: 170px;
+  overflow: auto;
+}
+
 @media (max-width: 767.98px) {
   .ordonnances-table {
     font-size: 0.8rem;

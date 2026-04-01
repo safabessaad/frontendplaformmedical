@@ -106,6 +106,15 @@ export class DoctorDossierMedicalComponent {
   protected get restrictedCount(): number { return this.records.filter((record) => record.access === 'Restreint').length; }
   protected get totalDocuments(): number { return this.records.reduce((sum, record) => sum + record.documents.length, 0); }
 
+  protected get formBlockReason(): string {
+    if (this.recordForm.valid) return '';
+    const c = this.recordForm.get('consentChecked');
+    if (c?.hasError('required')) {
+      return 'Cochez la case de consentement pour activer Enregistrer.';
+    }
+    return 'Remplissez patient, date de naissance et groupe sanguin.';
+  }
+
   protected selectRecord(record: MedicalRecordEntry): void {
     this.selectedRecord = record;
     this.editingId = record.id;
@@ -129,8 +138,15 @@ export class DoctorDossierMedicalComponent {
   }
 
   protected saveRecord(): void {
-    if (this.recordForm.invalid) return;
+    if (this.recordForm.invalid) {
+      this.recordForm.markAllAsTouched();
+      this.exportMessage = 'Veuillez remplir les champs obligatoires et cocher le consentement.';
+      return;
+    }
     const value = this.recordForm.getRawValue();
+    const historyLine = (value.historyLine ?? '').trim();
+    const extraHistory = historyLine ? [`${this.today()} - ${historyLine}`] : [];
+
     if (this.editingId) {
       this.records = this.records.map((record) =>
         record.id === this.editingId
@@ -144,14 +160,40 @@ export class DoctorDossierMedicalComponent {
               risk: (value.risk ?? 'Moyen') as RecordRisk,
               access: (value.access ?? 'Standard') as RecordAccess,
               notes: value.notes ?? '',
-              lastUpdate: this.today()
+              lastUpdate: this.today(),
+              history: extraHistory.length ? [...extraHistory, ...record.history] : record.history
             }
           : record
       );
       this.selectedRecord = this.records.find((record) => record.id === this.editingId) ?? null;
+      this.exportMessage = 'Dossier medical enregistre avec succes.';
+      this.recordForm.patchValue({ historyLine: '' });
+      return;
     }
-    this.exportMessage = 'Dossier medical enregistre avec succes.';
-    this.resetForm();
+
+    const newId = this.nextRecordId();
+    const newEntry: MedicalRecordEntry = {
+      id: newId,
+      patient: (value.patient ?? '').trim(),
+      birthDate: value.birthDate ?? '',
+      bloodGroup: (value.bloodGroup ?? '').trim(),
+      allergies: (value.allergies ?? '').trim(),
+      chronicDiseases: (value.chronicDiseases ?? '').trim(),
+      risk: (value.risk ?? 'Moyen') as RecordRisk,
+      access: (value.access ?? 'Standard') as RecordAccess,
+      lastUpdate: this.today(),
+      notes: (value.notes ?? '').trim(),
+      history: extraHistory,
+      documents: []
+    };
+    this.records = [newEntry, ...this.records];
+    this.selectedRecord = newEntry;
+    this.editingId = newId;
+    this.exportMessage = `Dossier ${newId} cree et affiche dans la liste.`;
+    this.recordForm.patchValue({
+      historyLine: '',
+      consentChecked: true
+    });
   }
 
   protected onDocumentPicked(event: Event): void {
@@ -328,6 +370,7 @@ export class DoctorDossierMedicalComponent {
 
   protected resetForm(): void {
     this.editingId = null;
+    this.selectedRecord = null;
     this.recordForm.reset({
       patient: '',
       birthDate: '',
@@ -340,6 +383,7 @@ export class DoctorDossierMedicalComponent {
       historyLine: '',
       consentChecked: false
     });
+    this.exportMessage = '';
   }
 
   protected riskClass(risk: RecordRisk): 'low' | 'medium' | 'high' {
@@ -350,5 +394,16 @@ export class DoctorDossierMedicalComponent {
 
   private today(): string {
     return new Date().toISOString().slice(0, 10);
+  }
+
+  private nextRecordId(): string {
+    const nums = this.records
+      .map((r) => {
+        const m = /^DME-(\d+)$/.exec(r.id);
+        return m ? Number(m[1]) : 0;
+      })
+      .filter((n) => n > 0);
+    const next = (nums.length ? Math.max(...nums) : 0) + 1;
+    return `DME-${String(next).padStart(3, '0')}`;
   }
 }

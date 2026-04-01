@@ -7,6 +7,8 @@
 .kpi { border: 1px solid #e2e8f0; border-radius: 0.55rem; background: #f8fafc; padding: 0.52rem; }
 .kpi strong { display: block; font-size: 1.04rem; color: #0f172a; }
 .kpi span { color: #64748b; font-size: 0.74rem; }
+.kpi-hint { display: block; margin-top: 0.25rem; font-size: 0.65rem; line-height: 1.25; color: #94a3b8; }
+.form-hint { margin: 0; font-size: 0.75rem; }
 .filters { display: grid; grid-template-columns: 1fr 170px 170px; gap: 0.55rem; margin-bottom: 0.75rem; }
 .table-wrap { overflow: auto; } .table { width: 100%; border-collapse: collapse; min-width: 820px; }
 .table th,.table td { text-align: left; border-bottom: 1px solid #f1f5f9; padding: 0.52rem 0.35rem; font-size: 0.82rem; }

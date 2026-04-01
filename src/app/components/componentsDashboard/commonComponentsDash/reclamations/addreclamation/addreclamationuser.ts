@@ -1,131 +1,73 @@
-import { Component, ElementRef, Renderer2 } from '@angular/core';
-import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { Config } from 'src/app/Config/Config';
-//import { ConvertPipe } from '../../../../../pipes/convert.pipe';
+import { Component, inject } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import type { ShellMetric } from '../../dashboard-shell/dashboard-shell.component';
+import { ReclamationsListService } from 'src/app/core/services/reclamations-list.service';
+
 @Component({
   selector: 'app-addreclamation-user',
-  standalone : false,
+  standalone: false,
   templateUrl: './addreclamationuser.html',
   styleUrl: './addreclamationuser.scss',
 })
 export class AddReclamationUser {
-  // n = 100;
+  private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly reclamationsList = inject(ReclamationsListService);
 
-  public Config: Config = new Config;
-  APIUrl : string = this.Config.getAPIPath();
+  feedback = '';
 
-  Countries: any;
-  States: any;
-  Roles: any;
-  userForm!: UntypedFormGroup;
+  readonly metrics: ShellMetric[] = [
+    { label: 'Delai moyen de reponse', value: '48 h', icon: 'ri-time-line', variant: 'primary' },
+    { label: 'Reclamations ce mois', value: '12', icon: 'ri-file-warning-line', variant: 'warning' },
+    { label: 'Taux de resolution', value: '94%', icon: 'ri-checkbox-circle-line', variant: 'success' },
+    { label: 'En attente', value: '3', icon: 'ri-loader-4-line', variant: 'muted' },
+  ];
 
-  // -------------
-  photoName            : string = "NoImage.jpg";
-  photoNameICN         : string = "NoImage.jpg";
-  photoNameICNBusiness : string = "NoImage.jpg";
-  photoUrl : string =this.Config.getPhotoPath("users");
-  photoProfile: string = this.photoUrl+ this.photoName;  
-  photoICN: string = this.photoUrl+ this.photoNameICN;  
-  photoICNBusiness: string = this.photoUrl+ this.photoNameICNBusiness; 
-  //--------------------- 
-  submitted = false;
-  alertMessage = "";
-
-  //****Checkbox******/
-  isPremium         = false;
-  isBusinessAccount = false;
-  isVerified        = false;
-  isActive          = false;
-  gender            = 1;
-
-
-  constructor(private router: Router,  private el: ElementRef,
-    private renderer: Renderer2 , public translate  : TranslateService, private formBuilder: UntypedFormBuilder) {
-    //translate.setDefaultLang('en');
-   
-  }
-
-
- 
-   
-  
-  formFieldHelpers: string[] = [''];
-  fixedSubscriptInput: FormControl = new FormControl('', [Validators.required]);
-  dynamicSubscriptInput: FormControl = new FormControl('', [Validators.required]);
-  fixedSubscriptInputWithHint: FormControl = new FormControl('', [Validators.required]);
-  dynamicSubscriptInputWithHint: FormControl = new FormControl('', [Validators.required]);
-
-  getFormFieldHelpersAsString(): string
-  {
-      return this.formFieldHelpers.join(' ');
-  }
-  resetForm (){
-
-  }
-
-
-  selectRole(role: string) {
-    // Handle role selection logic here
-    console.log('Selected role:', role);
-  }
-
-
-  ngOnInit(): void {
-    this.userForm = this.formBuilder.group({
-
- 
-      FirstName: ['Sami', [Validators.required, Validators.minLength(3)]],
-      LastName: ['Khiari', [Validators.required, Validators.minLength(3)]],
-      UserName: ['medSami', [Validators.required, Validators.minLength(3)]],
-      Password: ['Sami123456', [Validators.required]],
-      ICN: ['123456'],
-      Email: ['mohamedsamikhiari@gmail.com', [Validators.required, Validators.email]],
-      
-      Gender: ['male'],
-      
-      //IdCity: [null],
-      IdRole: [3, Validators.required],
-      
-      IsVerified: [false],
-      IsPremium: [false],
-      Active: [null]
-
-
+  readonly complaintForm = this.fb.group({
+    patient: ['', [Validators.required, Validators.minLength(2)]],
+    contactEmail: ['', [Validators.email]],
+    subject: ['', [Validators.required, Validators.minLength(3)]],
+    priority: ['Normale', Validators.required],
+    category: ['Qualite des soins', Validators.required],
+    description: ['', [Validators.required, Validators.minLength(15)]],
+    consent: [false, Validators.requiredTrue],
   });
 
-  // ******************************* States ***********************************
+  submit(): void {
+    if (this.complaintForm.invalid) {
+      this.complaintForm.markAllAsTouched();
+      this.feedback = 'Veuillez completer le formulaire et accepter le traitement.';
+      return;
+    }
+    const v = this.complaintForm.getRawValue();
+    const row = this.reclamationsList.addFromForm({
+      patient: (v.patient ?? '').trim(),
+      subject: (v.subject ?? '').trim(),
+      category: (v.category ?? '').trim(),
+      priority: (v.priority ?? '').trim(),
+      description: (v.description ?? '').trim(),
+      contactEmail: (v.contactEmail ?? '').trim(),
+    });
+    this.feedback = 'Reclamation enregistree avec succes. Redirection vers le suivi...';
+    window.setTimeout(() => {
+      const routeId = row.id.replace(/^R-/, '');
+      void this.router.navigate(['../view', routeId], { relativeTo: this.route });
+    }, 900);
+  }
 
-  // this.StatesService.getStates().subscribe((res: any)=>{
-  //   this.States = res;
-  //   //this.Role=res;
-  //   console.log(res);
-  // },(error: any) => {
-  //            console.log(error);
-  //       if(error.status == 400 || error.status == 0){
-  //         // Bad Request
-  //         alert("Error Connexion Server");
-  //       }
-  // });
-  
 
-  // ******************************* Countries ***********************************
-
-   
-} //onInit
-
-
-onSubmit() {
-
-}
-
-changeIsActive(){
-
-}
-
-changeGender(){
-  
-}
-
+  reset(): void {
+    this.complaintForm.reset({
+      patient: '',
+      contactEmail: '',
+      subject: '',
+      priority: 'Normale',
+      category: 'Qualite des soins',
+      description: '',
+      consent: false,
+    });
+    this.feedback = '';
+  }
 }

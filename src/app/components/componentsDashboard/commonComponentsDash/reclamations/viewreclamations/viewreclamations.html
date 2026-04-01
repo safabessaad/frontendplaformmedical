@@ -1,105 +1,129 @@
-<!-- Tables Without Borders -->
-<div class="row">
-    <div class="col-12">
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-            <h4 class="mb-sm-0">Reclamations</h4>
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a>Table</a></li>
-                    <li class="breadcrumb-item active">Basic Elements</li>
-                </ol>
-            </div>
-        </div>
-    </div>
-</div>
+<app-dashboard-shell
+  [title]="'Suivi des reclamations'"
+  [subtitle]="'Tableau de bord : statuts, responsables et prochaines actions.'"
+  [metrics]="metrics"
+>
+  <div shell-actions class="d-flex flex-wrap gap-2">
+    <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1" (click)="newComplaint()">
+      <i class="ri-add-line"></i>
+      Nouvelle reclamation
+    </button>
+    <button type="button" class="btn btn-soft-secondary btn-sm" (click)="exportCsv()">
+      <i class="ri-download-2-line"></i>
+      Exporter
+    </button>
+  </div>
 
-<div class="col-lg-12">
-        <div class="card">
-            <div class="align-items-center d-flex card-header">
-                <h4 class="card-title mb-0 flex-grow-1">{{ 'MENUITEMS.MENU.View' | translate }} {{ 'MENUITEMS.USERS.Users' | translate }}</h4>
-                <div class="flex-shrink-0">
-                    <div class="form-check form-switch form-switch-right form-switch-md"><label
-                            class="form-label text-muted form-label">Show Code</label> <input
-                            class="form-check-input code-switcher" type="checkbox"></div>
-                </div>
-            </div>
+  <p *ngIf="feedback" class="alert alert-info py-2 px-3 border-0 shadow-sm">{{ feedback }}</p>
 
-
-            <div class="card-body card-body">
-                <div class="row">
-                <table class="table table-borderless table-nowrap">
-                <thead>
-                <tr>
-                <th scope="col">Id</th>
-                <th scope="col">Name</th>
-                <th scope="col">Job Title</th>
-                <th scope="col">Date</th>
-                <th scope="col">Status</th>
-                <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                <th scope="row">1</th>
-                <td>Annette Black</td>
-                <td>Industrial Designer</td>
-                <td>10, Nov 2021</td>
-                <td><span class="badge bg-success-subtle text-success">Active</span></td>
-                <td>
-                <div class="hstack gap-3 fs-15">
-                <a href="javascript:void(0);" class="link-primary"><i class="ri-settings-4-line"></i></a>
-                <a href="javascript:void(0);" class="link-danger"><i class="ri-delete-bin-5-line"></i></a>
-                </div>
-                </td>
-                </tr>
-                <tr>
-                <th scope="row">2</th>
-                <td>Bessie Cooper</td>
-                <td>Graphic Designer</td>
-                <td>13, Nov 2021</td>
-                <td><span class="badge bg-success-subtle text-success">Active</span></td>
-                <td>
-                <div class="hstack gap-3 fs-15">
-                <a href="javascript:void(0);" class="link-primary"><i class="ri-settings-4-line"></i></a>
-                <a href="javascript:void(0);" class="link-danger"><i class="ri-delete-bin-5-line"></i></a>
-                </div>
-                </td>
-                </tr>
-                <tr>
-                <th scope="row">3</th>
-                <td>Leslie Alexander</td>
-                <td>Product Manager</td>
-                <td>17, Nov 2021</td>
-                <td><span class="badge bg-success-subtle text-success">Active</span></td>
-                <td>
-                <div class="hstack gap-3 fs-15">
-                <a href="javascript:void(0);" class="link-primary"><i class="ri-settings-4-line"></i></a>
-                <a href="javascript:void(0);" class="link-danger"><i class="ri-delete-bin-5-line"></i></a>
-                </div>
-                </td>
-                </tr>
-                <tr>
-                <th scope="row">4</th>
-                <td>Lenora Sandoval</td>
-                <td>Applications Engineer</td>
-                <td>25, Nov 2021</td>
-                <td><span class="badge bg-danger-subtle text-danger">Disabled</span></td>
-                <td>
-                <div class="hstack gap-3 fs-15">
-                <a href="javascript:void(0);" class="link-primary"><i class="ri-settings-4-line"></i></a>
-                <a href="javascript:void(0);" class="link-danger"><i class="ri-delete-bin-5-line"></i></a>
-                </div>
-                </td>
-                </tr>
-                </tbody>
-                </table>
-
+  <div class="view-toolbar card border-0 shadow-sm mb-3">
+    <div class="card-body py-3">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-6 col-lg-5">
+          <div class="position-relative">
+            <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+            <input
+              type="search"
+              class="form-control form-control-sm ps-5"
+              placeholder="ID, patient, sujet..."
+              [(ngModel)]="searchTerm"
+            />
           </div>
-            <!-- card-body -->
         </div>
-        <!-- card -->
+        <div class="col-md-4 col-lg-3">
+          <select class="form-select form-select-sm" [(ngModel)]="statusFilter">
+            <option value="Tous">Tous les statuts</option>
+            <option value="Ouverte">Ouverte</option>
+            <option value="En cours">En cours</option>
+            <option value="Resolue">Resolue</option>
+            <option value="Fermee">Fermee</option>
+          </select>
+        </div>
+        <div class="col-md-2 col-lg-4 text-md-end">
+          <span class="text-muted small">{{ filteredItems.length }} reclamation(s)</span>
+        </div>
+      </div>
     </div>
-    <!-- col-lg-12 -->
- 
-</div>
-<!-- row -->
+  </div>
+
+  <div class="card border-0 shadow-sm view-table-card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0 view-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Patient</th>
+              <th>Sujet</th>
+              <th>Date</th>
+              <th>Statut</th>
+              <th>Responsable</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of filteredItems">
+              <td class="fw-semibold text-primary">{{ row.id }}</td>
+              <td>{{ row.patient }}</td>
+              <td>{{ row.subject }}</td>
+              <td class="text-muted small">{{ row.openedAt }}</td>
+              <td>
+                <span class="badge rounded-pill border-0" [ngClass]="statusClass(row.status)">{{ row.status }}</span>
+              </td>
+              <td class="text-muted small">{{ row.owner }}</td>
+              <td class="text-end">
+                <div class="d-inline-flex gap-1">
+                  <button type="button" class="btn btn-sm btn-light" ngbTooltip="Voir" (click)="openRow(row, reclamationDetail)">
+                    <i class="ri-eye-line"></i>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-light" ngbTooltip="Traiter (e-mail au patient)" (click)="traiterReclamation(row)">
+                    <i class="ri-pencil-line"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="!filteredItems.length" class="text-center text-muted py-5">
+        <i class="ri-inbox-line fs-1 d-block mb-2 opacity-50"></i>
+        Aucune reclamation ne correspond aux filtres.
+      </div>
+    </div>
+  </div>
+</app-dashboard-shell>
+
+<ng-template #reclamationDetail let-modal>
+  <div class="modal-header border-0 pb-0">
+    <div>
+      <div class="text-muted small text-uppercase reclamation-detail__label">Reclamation</div>
+      <h5 class="modal-title mb-0">{{ detailRow?.id }}</h5>
+    </div>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body pt-2" *ngIf="detailRow as d">
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+      <span class="badge rounded-pill border-0" [ngClass]="statusClass(d.status)">{{ d.status }}</span>
+      <span class="text-muted small">{{ d.openedAt }}</span>
+    </div>
+    <dl class="row small mb-0 g-2 reclamation-detail">
+      <dt class="col-sm-4 text-muted">Patient</dt>
+      <dd class="col-sm-8 mb-0">{{ d.patient }}</dd>
+      <dt class="col-sm-4 text-muted">Sujet</dt>
+      <dd class="col-sm-8 mb-0">{{ d.subject }}</dd>
+      <dt class="col-sm-4 text-muted">Categorie</dt>
+      <dd class="col-sm-8 mb-0">{{ d.category || '—' }}</dd>
+      <dt class="col-sm-4 text-muted">Priorite</dt>
+      <dd class="col-sm-8 mb-0">{{ d.priority || '—' }}</dd>
+      <dt class="col-sm-4 text-muted">Contact</dt>
+      <dd class="col-sm-8 mb-0">{{ d.contactEmail || '—' }}</dd>
+      <dt class="col-sm-4 text-muted">Responsable</dt>
+      <dd class="col-sm-8 mb-0">{{ d.owner }}</dd>
+      <dt class="col-sm-12 text-muted mt-2">Description</dt>
+      <dd class="col-sm-12 mb-0 reclamation-detail__desc">{{ d.description || 'Aucune description disponible.' }}</dd>
+    </dl>
+  </div>
+  <div class="modal-footer border-0 pt-0">
+    <button type="button" class="btn btn-primary btn-sm" (click)="modal.close()">Fermer</button>
+  </div>
+</ng-template>

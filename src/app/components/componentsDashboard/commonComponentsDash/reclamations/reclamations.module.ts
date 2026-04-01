@@ -30,6 +30,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { createTranslateLoader } from 'src/app/app.module';
 import { HttpClient } from '@angular/common/http';
 import { LanguageService } from 'src/app/core/services/language.service';
+import { CommonComponentsDashModule } from '../common-components-dash.module';
+import { NgbTooltipModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 // Pages Routing
 // import { PagesRoutingModule } from "./pages-routing.module";
@@ -68,11 +70,7 @@ import { LanguageService } from 'src/app/core/services/language.service';
 ]
 
 @NgModule({
-  declarations: [
-     AddReclamationUser,
-     
-
-  ],
+  declarations: [AddReclamationUser, ViewreclamationsExtern, Editreclamation],
   imports: [
     CommonModule,
     FormsModule,
@@ -89,8 +87,10 @@ import { LanguageService } from 'src/app/core/services/language.service';
     SlickCarouselModule,
     LightboxModule,
     TranslateModule,
-    ReactiveFormsModule
-    
+    ReactiveFormsModule,
+    CommonComponentsDashModule,
+    NgbTooltipModule,
+    NgbModalModule,
   ],
   exports: [RouterModule],
   providers: [LanguageService],

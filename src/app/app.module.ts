@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 // search module
 import { NgPipesModule } from 'ngx-pipes';
@@ -56,7 +58,7 @@ import { Viewcauses } from './components/componentsAdmin/causes/viewcauses/viewc
 import { Addcause } from './components/componentsAdmin/causes/addcause/addcause';
 import { Editcause } from './components/componentsAdmin/causes/editcause/editcause';
 //----------------------
-import { ViewreclamationsExtern } from './components/componentsDashboard/commonComponentsDash/reclamations/viewreclamations/viewreclamations';
+import { CommonComponentsDashModule } from './components/componentsDashboard/commonComponentsDash/common-components-dash.module';
 import { LayoutsPatientModule } from './layoutsPatient/layoutPatient.module';
 import  { LayoutsSecretaryModule } from './layoutsSecretary/layoutsSecretary.module';
 import { LayoutsWebSiteModule } from './layoutsWebSite/layoutsWebSite.module';
@@ -100,7 +102,6 @@ if (environment.defaultauth === 'firebase') {
         // Addreclamation,
         // Editreclamation,
 
-        ViewreclamationsExtern,
         // ConvertPipe
     ],
     bootstrap: [AppComponent], 
@@ -115,6 +116,7 @@ if (environment.defaultauth === 'firebase') {
         }),
         BrowserAnimationsModule,
         BrowserModule,
+        FormsModule,
         AppRoutingModule,
         LayoutsModule,
         LayoutsAdminModule,
@@ -143,7 +145,9 @@ if (environment.defaultauth === 'firebase') {
             ApikeyEffects
         ]),
         PagesModule,
-        NgPipesModule
+        NgPipesModule,
+        CommonComponentsDashModule,
+        NgbTooltipModule
     ], 
         providers: [
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

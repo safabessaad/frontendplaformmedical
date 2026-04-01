@@ -93,19 +93,37 @@
               <span class="tc-badge" [ngClass]="sessionStatusClass(session.status)">{{ sessionStatusLabel(session.status) }}</span>
             </td>
             <td class="text-end">
-              <div class="tc-actions">
-                <a
-                  class="btn btn-sm btn-soft-primary"
-                  [href]="session.roomUrl"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  [attr.aria-label]="'Rejoindre la salle ' + session.id"
+              <div class="tc-actions d-inline-flex flex-wrap align-items-center gap-1 justify-content-end">
+                <span
+                  class="d-inline-block"
+                  [ngbTooltip]="!canJoinMeet(session) ? joinDisabledReason(session) : 'Ouvrir Google Meet (nouvelle reunion)'"
+                  container="body"
+                  placement="top"
                 >
-                  <span class="tc-actions__icon" aria-hidden="true">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                  </span>
-                  Rejoindre
-                </a>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-soft-primary"
+                    (click)="openJoin(session)"
+                    [disabled]="!canJoinMeet(session)"
+                    [attr.aria-label]="'Rejoindre la session ' + session.id"
+                    [title]="canJoinMeet(session) ? 'Ouvrir Google Meet' : joinDisabledReason(session)"
+                  >
+                    <span class="tc-actions__icon" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    </span>
+                    Rejoindre
+                  </button>
+                </span>
+                <span class="d-inline-block" [ngbTooltip]="calendarButtonTooltip()" container="body" placement="top">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light border"
+                    (click)="openCalendarSlot(session)"
+                    aria-label="Ouvrir Google Agenda pour ce dossier"
+                  >
+                    <i class="ri-calendar-line"></i>
+                  </button>
+                </span>
               </div>
             </td>
           </tr>

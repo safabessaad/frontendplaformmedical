@@ -2,17 +2,25 @@
   display: block;
 }
 
-.view-toolbar .form-control,
-.view-toolbar .form-select {
+.doc-actions .btn {
+  min-height: 2.25rem;
+}
+
+.doc-toolbar .form-control,
+.doc-toolbar .form-select {
   border-radius: 0.5rem;
 }
 
-.view-table-card {
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.doc-table-card {
   border-radius: 0.75rem;
   overflow: hidden;
 }
 
-.view-table {
+.doc-table {
   font-size: 0.875rem;
 
   thead th {
@@ -33,20 +41,16 @@
   }
 
   tbody tr:hover td {
-    background: rgba(79, 70, 229, 0.04);
+    background: rgba(37, 99, 235, 0.04);
   }
 }
 
-.reclamation-detail__label {
-  letter-spacing: 0.04em;
-}
-
-.reclamation-detail__desc {
-  white-space: pre-wrap;
-  word-break: break-word;
-  line-height: 1.5;
-  padding: 0.75rem 1rem;
-  background: #f8fafc;
-  border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
+.doc-type-pill {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #eff6ff;
+  color: #1d4ed8;
 }
